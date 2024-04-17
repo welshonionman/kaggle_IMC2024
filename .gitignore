@@ -1,0 +1,11 @@
+input/**
+
+*.png
+*.npy
+*.pth
+*.h5
+*.db
+
+__pycache__
+kaggle.json
+utils.ipynb
