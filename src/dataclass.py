@@ -5,6 +5,7 @@ import torch
 
 @dataclass
 class Config:
+    validation: bool
     base_path: Path
     feature_dir: Path
 

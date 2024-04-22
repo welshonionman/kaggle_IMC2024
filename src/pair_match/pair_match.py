@@ -55,13 +55,13 @@ def get_image_pairs(
 ) -> list[tuple[int, int]]:
     """類似した画像のペアを取得します"""
 
-    if len(paths) <= exhaustive_if_less:
-        return get_pairs_exhaustive(paths)
+    # if len(paths) <= exhaustive_if_less:
+    #     return get_pairs_exhaustive(paths)
 
     matches = []
 
     # 画像を埋め込み、フィルタリングのための距離を計算する
-    embeddings = embed_images(paths, model_name)  # shape: [len(filenames), output_dim]
+    embeddings = embed_images(paths, model_name, device)  # shape: [len(filenames), output_dim]
     distances = torch.cdist(embeddings, embeddings, p=p)  # shape: [len(filenames), len(filenames)]
     print(embeddings.shape, distances.shape)
 
@@ -89,4 +89,6 @@ def get_image_pairs(
                 # 冗長性を避けるために、ソートされた形式でペアを追加する
                 matches.append(tuple(sorted((current_image_index, other_image_index.item()))))
 
-    return sorted(list(set(matches)))
+    index_pairs = sorted(list(set(matches)))
+
+    return distances, index_pairs

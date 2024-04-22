@@ -57,9 +57,11 @@ def keypoint_distances(
     }
     matcher = KF.LightGlueMatcher("aliked", matcher_params).eval().to(device)
 
-    with h5py.File(feature_dir / "keypoints.h5", mode="r") as f_keypoints, h5py.File(
-        feature_dir / "descriptors.h5", mode="r"
-    ) as f_descriptors, h5py.File(feature_dir / "matches.h5", mode="w") as f_matches:
+    with (
+        h5py.File(feature_dir / "keypoints.h5", mode="r") as f_keypoints,
+        h5py.File(feature_dir / "descriptors.h5", mode="r") as f_descriptors,
+        h5py.File(feature_dir / "matches.h5", mode="w") as f_matches,
+    ):
         for idx1, idx2 in tqdm(index_pairs, desc="Computing keypoing distances"):
             key1, key2 = paths[idx1].name, paths[idx2].name
 

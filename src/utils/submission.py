@@ -1,6 +1,32 @@
 from pathlib import Path
 import numpy as np
 from src.utils import arr_to_str
+import pandas as pd
+
+
+def parse_train_labels(base_path: Path):
+    train_labels = pd.read_csv(base_path / "train/train_labels.csv")
+    train_labels["image_path"] = "train/" + train_labels["scene"] + "/images/" + train_labels["image_name"]
+    train_labels = train_labels[["image_path", "dataset", "scene", "rotation_matrix", "translation_vector"]]
+
+    duplicate = train_labels.duplicated(subset=["image_path", "scene"], keep="first")
+    train_labels = train_labels[~duplicate]
+
+    data_dict = {}
+    for i, row in enumerate(train_labels.itertuples()):
+        image_path = row.image_path
+        dataset = row.dataset
+        scene = row.scene
+        if dataset not in data_dict:
+            data_dict[dataset] = {}
+        if scene not in data_dict[dataset]:
+            data_dict[dataset][scene] = []
+        data_dict[dataset][scene].append(Path(base_path / image_path))
+
+    for dataset in data_dict:
+        for scene in data_dict[dataset]:
+            print(f"{dataset} / {scene} -> {len(data_dict[dataset][scene])} images")
+    return data_dict
 
 
 def parse_sample_submission(
@@ -39,7 +65,7 @@ def create_submission(
 ) -> None:
     """Prepares a submission file."""
 
-    with open("submission.csv", "w") as f:
+    with open("/kaggle/working/submission.csv", "w") as f:
         f.write("image_path,dataset,scene,rotation_matrix,translation_vector\n")
 
         for dataset in data_dict:
