@@ -31,9 +31,9 @@ RUN apt-get update --fix-missing && apt-get install -y --no-install-recommends\
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY env/requirements.txt /tmp/requirements.txt
-COPY env/vscode_extentions.sh /tmp/vscode_extentions.sh
-COPY env/.bashrc /root/.bashrc
+COPY requirements.txt /tmp/requirements.txt
+COPY vscode_extentions.sh /tmp/vscode_extentions.sh
+COPY .bashrc /root/.bashrc
 
 RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 RUN pip3 install -r /tmp/requirements.txt && \
