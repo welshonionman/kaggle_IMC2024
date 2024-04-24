@@ -40,7 +40,7 @@ def run_from_config(config: Config) -> None:
         for scene in data_dict[dataset]:
             images_dir = data_dict[dataset][scene][0].parent
             results[dataset][scene] = {}
-            image_paths = data_dict[dataset][scene][:5]  ##
+            image_paths = data_dict[dataset][scene]
             print(f"\n{scene}: Got {len(image_paths)} images")
 
             feature_dir = config.feature_dir / f"{dataset}_{scene}"
