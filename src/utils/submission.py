@@ -23,8 +23,8 @@ def parse_train_labels(base_path: Path):
             data_dict[dataset][scene] = []
         data_dict[dataset][scene].append(Path(base_path / image_path))
 
-    for dataset in data_dict:
-        for scene in data_dict[dataset]:
+    for dataset in sorted(data_dict):
+        for scene in sorted(data_dict[dataset]):
             print(f"{dataset} / {scene} -> {len(data_dict[dataset][scene])} images")
     return data_dict
 
@@ -51,8 +51,8 @@ def parse_sample_submission(
                     data_dict[dataset][scene] = []
                 data_dict[dataset][scene].append(Path(base_path / image_path))
 
-    for dataset in data_dict:
-        for scene in data_dict[dataset]:
+    for dataset in sorted(data_dict):
+        for scene in sorted(data_dict[dataset]):
             print(f"{dataset} / {scene} -> {len(data_dict[dataset][scene])} images")
 
     return data_dict
@@ -85,7 +85,7 @@ def create_submission(
                 # Write the row with rotation and translation matrices
                 for image in data_dict[dataset][scene]:
                     if image in scene_res:
-                        print(image)
+                        # print(image)
                         R = scene_res[image]["R"].reshape(-1)
                         T = scene_res[image]["t"].reshape(-1)
                     else:

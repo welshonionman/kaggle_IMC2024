@@ -63,7 +63,6 @@ def get_image_pairs(
     # 画像を埋め込み、フィルタリングのための距離を計算する
     embeddings = embed_images(paths, model_name, device)  # shape: [len(filenames), output_dim]
     distances = torch.cdist(embeddings, embeddings, p=p)  # shape: [len(filenames), len(filenames)]
-    print(embeddings.shape, distances.shape)
 
     # 類似度閾値を超えるペアを削除する（十分な数がある場合）
     mask = distances <= similarity_threshold
