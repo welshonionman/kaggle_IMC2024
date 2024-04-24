@@ -5,10 +5,9 @@ import torch
 
 @dataclass
 class Config:
-    validation: bool
     base_path: Path
     feature_dir: Path
-
+    target_scene: list[str]
     device: torch.device
 
     pair_matching_args: dict

@@ -15,33 +15,37 @@ from src.utils.submission import parse_sample_submission, create_submission, par
 from src.utils import import_into_colmap
 from src.utils.metrics import score
 
+pycolmap.logging.minloglevel = 3
+
 
 def run_from_config(config: Config) -> None:
     # def run_from_config(config) -> None:
     device = K.utils.get_cuda_device_if_available(0)
     results = {}
 
-    if "kaggle_web_client" in sys.modules:
+    is_kaggle_notebook = "kaggle_web_client" in sys.modules
+    if is_kaggle_notebook:
         train_test = "test"
         data_dict = parse_sample_submission(config.base_path)
     else:
         train_test = "train"
         data_dict = parse_train_labels(config.base_path)
 
-    datasets = list(data_dict.keys())
+    datasets = sorted(list(data_dict.keys()))
     for dataset in datasets:
+        if (not is_kaggle_notebook) and (dataset not in config.target_scene):
+            continue
         if dataset not in results:
             results[dataset] = {}
-
         for scene in data_dict[dataset]:
             images_dir = data_dict[dataset][scene][0].parent
             results[dataset][scene] = {}
-            image_paths = data_dict[dataset][scene]  ##
-            print(f"Got {len(image_paths)} images")
+            image_paths = data_dict[dataset][scene][:5]  ##
+            print(f"\n{scene}: Got {len(image_paths)} images")
 
             feature_dir = config.feature_dir / f"{dataset}_{scene}"
             feature_dir.mkdir(parents=True, exist_ok=True)
-            print(feature_dir)
+
             database_path = feature_dir / "colmap.db"
             if database_path.exists():
                 database_path.unlink()
@@ -67,21 +71,21 @@ def run_from_config(config: Config) -> None:
             output_path.mkdir(parents=True, exist_ok=True)
 
             # 4.2. RANSACを実行する（マッチングの外れ値を検出する）
-            pycolmap.match_exhaustive(database_path, sift_options={'num_threads':1})
+            pycolmap.match_exhaustive(database_path, sift_options={"num_threads": 1})
 
             mapper_options = pycolmap.IncrementalPipelineOptions(**config.colmap_mapper_options)
 
             # 5.1 シーンの再構築を開始する（スパースな再構築）
             maps = pycolmap.incremental_mapping(database_path=database_path, image_path=images_dir, output_path=output_path, options=mapper_options)
 
-            print(maps)
-            clear_output(wait=False)
+            # print(maps)
+            # clear_output(wait=False)
 
             # 5.2. 最適な再構築を探す：pycolmapが提供するインクリメンタルマッピングでは、複数のモデルを再構築しようとしますが、最良のものを選ぶ必要があります
             images_registered = 0
             best_idx = None
 
-            print("最適な再構築を探しています")
+            print("\n最適な再構築を探しています")
 
             if isinstance(maps, dict):
                 for idx1, rec in maps.items():
@@ -100,16 +104,17 @@ def run_from_config(config: Config) -> None:
                     results[dataset][scene][key] = {}
                     results[dataset][scene][key]["R"] = deepcopy(im.cam_from_world.rotation.matrix())
                     results[dataset][scene][key]["t"] = deepcopy(np.array(im.cam_from_world.translation))
+            print()
             print(f"登録済み: {dataset} / {scene} -> {len(results[dataset][scene])} 枚の画像")
             print(f"合計: {dataset} / {scene} -> {len(data_dict[dataset][scene])} 枚の画像")
 
             create_submission(results, data_dict, config.base_path)
             gc.collect()
 
-    if "kaggle_web_client" not in sys.modules:
+    if not is_kaggle_notebook:
         gt_csv = "/kaggle/input/image-matching-challenge-2024/train/train_labels.csv"
         user_csv = "/kaggle/working/submission.csv"
         gt_df = pd.read_csv(gt_csv).rename(columns={"image_name": "image_path"})
         sub_df = pd.read_csv(user_csv)
         sub_df["image_path"] = sub_df["image_path"].str.split("/").str[-1]
-        score(gt_df, sub_df)
+        score(gt_df, sub_df, config.target_scene)

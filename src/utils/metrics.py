@@ -5,6 +5,7 @@ import math
 import numpy as np
 import pandas as pd
 import pandas.api.types
+from src.dataclass import Config
 
 _EPS = np.finfo(float).eps * 4.0
 
@@ -336,7 +337,7 @@ def evaluate_rec(
     return mAA
 
 
-def score(solution: pd.DataFrame, submission: pd.DataFrame) -> float:
+def score(solution: pd.DataFrame, submission: pd.DataFrame, target_scene: list[str]) -> float:
     """The metric is an mean average accuracy between solution and submission camera centers.
     Prior to calculate the metric, a function performs exhaustive registration (like RANSAC, but
     not random, considering all possible configurations) to align the user camera system to the GT"""
@@ -344,7 +345,7 @@ def score(solution: pd.DataFrame, submission: pd.DataFrame) -> float:
     scenes = sorted(list(set(solution["dataset"].tolist())))
     results_per_dataset = []
     for dataset in scenes:
-        if "transp_obj_glass_cup" != dataset:
+        if dataset not in target_scene:
             continue
         # start = time.time()
         gt_ds = solution[solution["dataset"] == dataset]
