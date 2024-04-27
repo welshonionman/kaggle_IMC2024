@@ -18,8 +18,36 @@ from src.utils.metrics import score
 pycolmap.logging.minloglevel = 3
 
 
+def find_optimal_reconstruction(maps):
+    images_registered = 0
+    best_idx = None
+
+    print("\nFinding the best reconstruction")
+
+    if isinstance(maps, dict):
+        for idx1, rec in maps.items():
+            print(idx1, rec.summary())
+            try:
+                if len(rec.images) > images_registered:
+                    images_registered = len(rec.images)
+                    best_idx = idx1
+            except Exception:
+                continue
+
+    return best_idx
+
+
+def parse_reconstructed_object(results, dataset, scene, maps, best_idx, train_test, base_path):
+    if best_idx is not None:
+        for k, im in maps[best_idx].images.items():
+            key = base_path / train_test / scene / "images" / im.name
+            results[dataset][scene][key] = {}
+            results[dataset][scene][key]["R"] = deepcopy(im.cam_from_world.rotation.matrix())
+            results[dataset][scene][key]["t"] = deepcopy(np.array(im.cam_from_world.translation))
+    return results
+
+
 def run_from_config(config: Config) -> None:
-    # def run_from_config(config) -> None:
     device = K.utils.get_cuda_device_if_available(0)
     results = {}
 
@@ -78,32 +106,11 @@ def run_from_config(config: Config) -> None:
             # 5.1 シーンの再構築を開始する（スパースな再構築）
             maps = pycolmap.incremental_mapping(database_path=database_path, image_path=images_dir, output_path=output_path, options=mapper_options)
 
-            # print(maps)
-            # clear_output(wait=False)
-
             # 5.2. 最適な再構築を探す：pycolmapが提供するインクリメンタルマッピングでは、複数のモデルを再構築しようとしますが、最良のものを選ぶ必要があります
-            images_registered = 0
-            best_idx = None
-
-            print("\n最適な再構築を探しています")
-
-            if isinstance(maps, dict):
-                for idx1, rec in maps.items():
-                    print(idx1, rec.summary())
-                    try:
-                        if len(rec.images) > images_registered:
-                            images_registered = len(rec.images)
-                            best_idx = idx1
-                    except Exception:
-                        continue
+            best_idx = find_optimal_reconstruction(maps)
 
             # 再構築オブジェクトを解析して、再構築における各画像の回転行列と並進ベクトルを取得する
-            if best_idx is not None:
-                for k, im in maps[best_idx].images.items():
-                    key = config.base_path / train_test / scene / "images" / im.name
-                    results[dataset][scene][key] = {}
-                    results[dataset][scene][key]["R"] = deepcopy(im.cam_from_world.rotation.matrix())
-                    results[dataset][scene][key]["t"] = deepcopy(np.array(im.cam_from_world.translation))
+            results = parse_reconstructed_object(results, dataset, scene, maps, best_idx, train_test, config.base_path)
             print()
             print(f"登録済み: {dataset} / {scene} -> {len(results[dataset][scene])} 枚の画像")
             print(f"合計: {dataset} / {scene} -> {len(data_dict[dataset][scene])} 枚の画像")
