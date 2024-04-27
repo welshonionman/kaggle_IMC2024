@@ -6,45 +6,15 @@ import pycolmap
 import sys
 import pandas as pd
 
-from copy import deepcopy
-from IPython.display import clear_output
 from src.pair_match import get_image_pairs
 from src.keypoint import detect_keypoints, keypoint_distances
 from src.dataclass import Config
 from src.utils.submission import parse_sample_submission, create_submission, parse_train_labels
 from src.utils import import_into_colmap
 from src.utils.metrics import score
+from src.reconstruction import find_optimal_reconstruction, parse_reconstructed_object
 
 pycolmap.logging.minloglevel = 3
-
-
-def find_optimal_reconstruction(maps):
-    images_registered = 0
-    best_idx = None
-
-    print("\nFinding the best reconstruction")
-
-    if isinstance(maps, dict):
-        for idx1, rec in maps.items():
-            print(idx1, rec.summary())
-            try:
-                if len(rec.images) > images_registered:
-                    images_registered = len(rec.images)
-                    best_idx = idx1
-            except Exception:
-                continue
-
-    return best_idx
-
-
-def parse_reconstructed_object(results, dataset, scene, maps, best_idx, train_test, base_path):
-    if best_idx is not None:
-        for k, im in maps[best_idx].images.items():
-            key = base_path / train_test / scene / "images" / im.name
-            results[dataset][scene][key] = {}
-            results[dataset][scene][key]["R"] = deepcopy(im.cam_from_world.rotation.matrix())
-            results[dataset][scene][key]["t"] = deepcopy(np.array(im.cam_from_world.translation))
-    return results
 
 
 def run_from_config(config: Config) -> None:
