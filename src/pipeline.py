@@ -61,6 +61,7 @@ def gpu_process(
 
 
 def cpu_process(
+    data_dict: dict[dict[str, list[Path]]],
     images_dir: Path,
     feature_dir: Path,
     database_path: Path,
@@ -89,7 +90,10 @@ def cpu_process(
 
     # 再構築オブジェクトを解析して、再構築における各画像の回転行列と並進ベクトルを取得する
     results = parse_reconstructed_object(results, dataset, scene, maps, best_idx, train_test, config.base_path)
-    return results
+    print(f"\n登録済み: {dataset} / {scene} -> {len(results[dataset][scene])} / {len(data_dict[dataset][scene])}")
+
+    create_submission(results, data_dict, config.base_path)
+    gc.collect()
 
 
 def run_from_config(config: Config) -> None:
@@ -118,11 +122,7 @@ def run_from_config(config: Config) -> None:
             gpu_process(image_paths, feature_dir, config, device)
             sleep(1)
 
-            results = cpu_process(images_dir, feature_dir, database_path, config, results, dataset, scene, train_test)
-            print(f"\n登録済み: {dataset} / {scene} -> {len(results[dataset][scene])} / {len(data_dict[dataset][scene])}")
-
-            create_submission(results, data_dict, config.base_path)
-            gc.collect()
+            cpu_process(data_dict, images_dir, feature_dir, database_path, config, results, dataset, scene, train_test)
 
     if not is_kaggle_notebook:
         print()
