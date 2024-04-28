@@ -19,12 +19,33 @@ from src.reconstruction import find_optimal_reconstruction, parse_reconstructed_
 pycolmap.logging.minloglevel = 3
 
 
+def preparation(
+    data_dict: dict[dict[str, list[Path]]],
+    dataset: str,
+    scene: str,
+    results: dict,
+    config: Config,
+) -> tuple[dict, Path, list[Path], Path, Path]:
+    images_dir = data_dict[dataset][scene][0].parent
+    image_paths = data_dict[dataset][scene][:4]
+    results[dataset][scene] = {}
+
+    feature_dir = config.feature_dir / f"{dataset}_{scene}"
+    feature_dir.mkdir(parents=True, exist_ok=True)
+
+    database_path = feature_dir / "colmap.db"
+    if database_path.exists():
+        database_path.unlink()
+
+    return results, images_dir, image_paths, feature_dir, database_path
+
+
 def gpu_process(
     image_paths: list[Path],
     feature_dir: Path,
     config: Config,
     device: torch.device,
-):
+) -> None:
     # 1. 似ていると思われる画像のペアを取得する
     distances, index_pairs = get_image_pairs(image_paths, **config.pair_matching_args, device=config.device)
     gc.collect()
@@ -48,7 +69,7 @@ def cpu_process(
     dataset: str,
     scene: str,
     train_test: str,
-):
+) -> dict:
     # 4.1. マッチングした特徴点の距離をcolmapにインポートする
     import_into_colmap(images_dir, feature_dir, database_path)
 
@@ -91,25 +112,14 @@ def run_from_config(config: Config) -> None:
         if dataset not in results:
             results[dataset] = {}
         for scene in data_dict[dataset]:
-            images_dir = data_dict[dataset][scene][0].parent
-            results[dataset][scene] = {}
-            image_paths = data_dict[dataset][scene][:4]
-            print(f"\n[{dataset:<33}]")
-
-            feature_dir = config.feature_dir / f"{dataset}_{scene}"
-            feature_dir.mkdir(parents=True, exist_ok=True)
-
-            database_path = feature_dir / "colmap.db"
-            if database_path.exists():
-                database_path.unlink()
+            print(f"\n****** {dataset} ******")
+            results, images_dir, image_paths, feature_dir, database_path = preparation(data_dict, dataset, scene, results, config)
 
             gpu_process(image_paths, feature_dir, config, device)
-
             sleep(1)
 
             results = cpu_process(images_dir, feature_dir, database_path, config, results, dataset, scene, train_test)
-            print()
-            print(f"登録済み: {dataset} / {scene} -> {len(results[dataset][scene])} / {len(data_dict[dataset][scene])}")
+            print(f"\n登録済み: {dataset} / {scene} -> {len(results[dataset][scene])} / {len(data_dict[dataset][scene])}")
 
             create_submission(results, data_dict, config.base_path)
             gc.collect()
