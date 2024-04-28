@@ -1,10 +1,11 @@
 from pathlib import Path
 import numpy as np
-from src.utils import arr_to_str
 import pandas as pd
+from src.utils import arr_to_str
+from src.dataclass import Config
 
 
-def parse_train_labels(base_path: Path):
+def parse_train_labels(base_path: Path, config: Config):
     train_labels = pd.read_csv(base_path / "train/train_labels.csv")
     train_labels["image_path"] = "train/" + train_labels["scene"] + "/images/" + train_labels["image_name"]
     train_labels = train_labels[["image_path", "dataset", "scene", "rotation_matrix", "translation_vector"]]
@@ -25,13 +26,14 @@ def parse_train_labels(base_path: Path):
 
     for dataset in sorted(data_dict):
         for scene in sorted(data_dict[dataset]):
-            print(f"{dataset} / {scene} -> {len(data_dict[dataset][scene])} images")
+            print(
+                f"{dataset} / {scene} -> {len(data_dict[dataset][scene])} images",
+                file=open(config.log_path, "a"),
+            )
     return data_dict
 
 
-def parse_sample_submission(
-    base_path: Path,
-) -> dict[dict[str, list[Path]]]:
+def parse_sample_submission(base_path: Path, config: Config) -> dict[dict[str, list[Path]]]:
     """Construct a dict describing the test data as
 
     {"dataset": {"scene": [<image paths>]}}
@@ -53,7 +55,10 @@ def parse_sample_submission(
 
     for dataset in sorted(data_dict):
         for scene in sorted(data_dict[dataset]):
-            print(f"{dataset} / {scene} -> {len(data_dict[dataset][scene])} images")
+            print(
+                f"{dataset} / {scene} -> {len(data_dict[dataset][scene])} images",
+                file=open(config.log_path, "a"),
+            )
 
     return data_dict
 

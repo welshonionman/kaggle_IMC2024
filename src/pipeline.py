@@ -1,9 +1,6 @@
-from pathlib import Path
+import time
 import gc
-import kornia as K
-import torch
 import pycolmap
-import sys
 from concurrent.futures import ThreadPoolExecutor
 from concurrent import futures
 
@@ -14,6 +11,7 @@ from src.utils.submission import parse_sample_submission, create_submission, par
 from src.utils import import_into_colmap
 from src.utils.evaluate import evaluate
 from src.reconstruction import find_optimal_reconstruction, parse_reconstructed_object
+from src.utils.utils import timer
 
 pycolmap.logging.minloglevel = 3
 
@@ -28,7 +26,10 @@ def preparation(
     scene = target_dict["scene"]
 
     images_dir = data_dict[dataset][scene][0].parent
-    image_paths = data_dict[dataset][scene][:30]
+    image_paths = data_dict[dataset][scene]
+    if not config.is_kaggle_notebook:
+        image_paths = image_paths[: config.valid_image_num]
+
     results[dataset][scene] = {}
 
     feature_dir = config.feature_dir / f"{dataset}_{scene}"
@@ -45,7 +46,6 @@ def preparation(
 def gpu_process(
     path_dict: dict,
     config: Config,
-    device: torch.device,
 ) -> None:
     image_paths = path_dict["image_paths"]
     feature_dir = path_dict["feature_dir"]
@@ -55,11 +55,11 @@ def gpu_process(
     gc.collect()
 
     # 2. すべての画像の特徴点を検出する
-    detect_keypoints(image_paths, feature_dir, **config.keypoint_detection_args, device=device)
+    detect_keypoints(image_paths, feature_dir, **config.keypoint_detection_args, device=config.device)
     gc.collect()
 
     # 3. 似ている画像のペアの特徴点をマッチングする
-    keypoint_distances(image_paths, index_pairs, feature_dir, **config.keypoint_distances_args, device=device)
+    keypoint_distances(image_paths, index_pairs, feature_dir, **config.keypoint_distances_args, device=config.device)
     gc.collect()
     return
 
@@ -93,33 +93,38 @@ def cpu_process(
     maps = pycolmap.incremental_mapping(database_path=database_path, image_path=images_dir, output_path=output_path, options=mapper_options)
 
     # 5.2. 最適な再構築を探す：pycolmapが提供するインクリメンタルマッピングでは、複数のモデルを再構築しようとしますが、最良のものを選ぶ必要があります
-    best_idx = find_optimal_reconstruction(maps)
+    best_idx = find_optimal_reconstruction(maps, scene, config)
 
     # 再構築オブジェクトを解析して、再構築における各画像の回転行列と並進ベクトルを取得する
     results = parse_reconstructed_object(results, dataset, scene, maps, best_idx, category, config.base_path)
-    print(f"\n登録済み: {dataset} / {scene} -> {len(results[dataset][scene])} / {len(data_dict[dataset][scene])}")
+    print(
+        f"\nRegistered: {dataset} / {scene} -> {len(results[dataset][scene])} / {len(data_dict[dataset][scene])}",
+        file=open(config.log_path, "a"),
+    )
 
     create_submission(results, data_dict, config.base_path)
     gc.collect()
 
 
+@timer
 def run_from_config(config: Config) -> None:
-    device = K.utils.get_cuda_device_if_available(0)
+    config.log_path.parent.mkdir(parents=True, exist_ok=True)
+    print("", file=open(config.log_path, "w"))
+    start = time.time()
     results = {}
-    is_kaggle_notebook = "kaggle_web_client" in sys.modules
     is_remain_cpu_process = False
 
-    if is_kaggle_notebook:
+    if config.is_kaggle_notebook:
         category = "test"
-        data_dict = parse_sample_submission(config.base_path)
+        data_dict = parse_sample_submission(config.base_path, config)
     else:
         category = "train"
-        data_dict = parse_train_labels(config.base_path)
+        data_dict = parse_train_labels(config.base_path, config)
 
     datasets = sorted(list(data_dict.keys()))
 
     for dataset in datasets:
-        if (not is_kaggle_notebook) and (dataset not in config.target_scene):
+        if (not config.is_kaggle_notebook) and (dataset not in config.target_scene):
             continue
 
         if dataset not in results:
@@ -131,14 +136,14 @@ def run_from_config(config: Config) -> None:
             path_dict, results = preparation(target_dict, results, config)
 
             if not is_remain_cpu_process:
-                gpu_process(path_dict, config, device)
+                gpu_process(path_dict, config)
                 is_remain_cpu_process = True
                 prev_paths_dict = path_dict
                 prev_target_dict = target_dict
 
             else:
                 with ThreadPoolExecutor(max_workers=2) as executor:
-                    future1 = executor.submit(gpu_process, path_dict, config, device)
+                    future1 = executor.submit(gpu_process, path_dict, config)
                     future2 = executor.submit(cpu_process, results, prev_target_dict, prev_paths_dict, category, config)
 
                     future_list = [future1, future2]
@@ -151,6 +156,12 @@ def run_from_config(config: Config) -> None:
     if is_remain_cpu_process:
         cpu_process(results, prev_target_dict, prev_paths_dict, category, config)
 
-    if not is_kaggle_notebook:
+    if not config.is_kaggle_notebook:
         print()
         evaluate(config)
+
+    elapsed_time = time.time() - start
+    print(
+        f"\nelapsed_time: {elapsed_time:.2f} [sec]",
+        file=open(config.log_path, "a"),
+    )

@@ -5,6 +5,11 @@ import torch
 
 @dataclass
 class Config:
+    exp_name: str
+    is_kaggle_notebook: bool
+    valid_image_num: int
+    log_path: Path
+
     base_path: Path
     feature_dir: Path
     target_scene: list[str]

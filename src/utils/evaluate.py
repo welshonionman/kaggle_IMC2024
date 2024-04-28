@@ -337,7 +337,7 @@ def evaluate_rec(
     return mAA
 
 
-def score(solution: pd.DataFrame, submission: pd.DataFrame, target_scene: list[str]) -> float:
+def score(solution: pd.DataFrame, submission: pd.DataFrame, config: Config) -> float:
     """The metric is an mean average accuracy between solution and submission camera centers.
     Prior to calculate the metric, a function performs exhaustive registration (like RANSAC, but
     not random, considering all possible configurations) to align the user camera system to the GT"""
@@ -345,7 +345,7 @@ def score(solution: pd.DataFrame, submission: pd.DataFrame, target_scene: list[s
     scenes = sorted(list(set(solution["dataset"].tolist())))
     results_per_dataset = []
     for dataset in scenes:
-        if dataset not in target_scene:
+        if dataset not in config.target_scene:
             continue
         # start = time.time()
         gt_ds = solution[solution["dataset"] == dataset]
@@ -356,13 +356,19 @@ def score(solution: pd.DataFrame, submission: pd.DataFrame, target_scene: list[s
             gt_ds, user_ds, inl_cf=0, strict_cf=-1, skip_top_thresholds=0, to_dec=3, thresholds=translation_thresholds_meters_dict[dataset]
         )
         # end = time.time()
-        print(f"[{dataset:<33}] mAA: {result*100:8.4f}%")
+        print(
+            f"[{dataset:<33}] mAA: {result*100:8.4f}%",
+            file=open(config.log_path, "a"),
+        )
         # print(f"\n*** {dataset} ***")
         # print(f"\nmAA: {result*100:.4f}%")
         # print("Running time: %s" % (end - start))
         results_per_dataset.append(result)
     mAA = float(np.array(results_per_dataset).mean())
-    print(f"\n[ Global mAA                      ] mAA: {mAA*100:8.4f}%")
+    print(
+        f"\n[ Global mAA                      ] mAA: {mAA*100:8.4f}%",
+        file=open(config.log_path, "a"),
+    )
     # return float(np.array(results_per_dataset).mean())
 
 
@@ -372,4 +378,5 @@ def evaluate(config: Config):
     gt_df = pd.read_csv(gt_csv).rename(columns={"image_name": "image_path"})
     sub_df = pd.read_csv(user_csv)
     sub_df["image_path"] = sub_df["image_path"].str.split("/").str[-1]
-    score(gt_df, sub_df, config.target_scene)
+    print("\n", file=open(config.log_path, "a"))
+    score(gt_df, sub_df, config)

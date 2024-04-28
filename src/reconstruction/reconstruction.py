@@ -1,17 +1,19 @@
 from pathlib import Path
 from copy import deepcopy
 import numpy as np
+from src.dataclass import Config
 
 
-def find_optimal_reconstruction(maps: dict) -> int:
+def find_optimal_reconstruction(maps: dict, scene: str, config: Config) -> int:
     images_registered = 0
     best_idx = None
 
-    print("\nFinding the best reconstruction")
-
     if isinstance(maps, dict):
         for idx1, rec in maps.items():
-            print(rec.summary())
+            print(
+                f"\n\n***** {scene} *****\n{rec.summary()}",
+                file=open(config.log_path, "a"),
+            )
             try:
                 if len(rec.images) > images_registered:
                     images_registered = len(rec.images)

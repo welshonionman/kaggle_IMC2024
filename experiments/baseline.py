@@ -3,13 +3,22 @@ import shutil
 from pathlib import Path
 import kornia as K
 from src.pipeline import run_from_config
+import sys
+import warnings
+
+warnings.filterwarnings("ignore")
 
 
 class Config:
+    exp_name: str = __file__.split("/")[-1].replace(".py", "")
+    is_kaggle_notebook: bool = "kaggle_web_client" in sys.modules
+    valid_image_num: int = 20
+    log_path = Path(f"/kaggle/log/{exp_name}.log")
+
     base_path: Path = Path("/kaggle/input/image-matching-challenge-2024")
     feature_dir: Path = Path("/kaggle/.sample/")
     target_scene: list[str] = [
-        # "church",
+        "church",
         "dioscuri",
         # "lizard",
         "multi-temporal-temple-baalshamin",
@@ -51,4 +60,4 @@ class Config:
 
 if __name__ == "__main__":
     shutil.rmtree(Config.feature_dir, ignore_errors=True)
-    run_from_config(Config)
+    run_from_config(config=Config)
