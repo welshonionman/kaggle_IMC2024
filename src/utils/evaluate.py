@@ -364,3 +364,12 @@ def score(solution: pd.DataFrame, submission: pd.DataFrame, target_scene: list[s
     mAA = float(np.array(results_per_dataset).mean())
     print(f"\n[ Global mAA                      ] mAA: {mAA*100:8.4f}%")
     # return float(np.array(results_per_dataset).mean())
+
+
+def evaluate(config: Config):
+    gt_csv = "/kaggle/input/image-matching-challenge-2024/train/train_labels.csv"
+    user_csv = "/kaggle/working/submission.csv"
+    gt_df = pd.read_csv(gt_csv).rename(columns={"image_name": "image_path"})
+    sub_df = pd.read_csv(user_csv)
+    sub_df["image_path"] = sub_df["image_path"].str.split("/").str[-1]
+    score(gt_df, sub_df, config.target_scene)

@@ -1,12 +1,9 @@
-from time import sleep
 from pathlib import Path
 import gc
-import numpy as np
 import kornia as K
 import torch
 import pycolmap
 import sys
-import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 from concurrent import futures
 
@@ -15,19 +12,21 @@ from src.keypoint import detect_keypoints, keypoint_distances
 from src.dataclass import Config
 from src.utils.submission import parse_sample_submission, create_submission, parse_train_labels
 from src.utils import import_into_colmap
-from src.utils.metrics import score
+from src.utils.evaluate import evaluate
 from src.reconstruction import find_optimal_reconstruction, parse_reconstructed_object
 
 pycolmap.logging.minloglevel = 3
 
 
 def preparation(
-    data_dict: dict[dict[str, list[Path]]],
-    dataset: str,
-    scene: str,
+    target_dict: dict,
     results: dict,
     config: Config,
-) -> tuple[dict, Path, list[Path], Path, Path]:
+) -> tuple[dict, dict]:
+    data_dict = target_dict["data_dict"]
+    dataset = target_dict["dataset"]
+    scene = target_dict["scene"]
+
     images_dir = data_dict[dataset][scene][0].parent
     image_paths = data_dict[dataset][scene][:30]
     results[dataset][scene] = {}
@@ -39,15 +38,18 @@ def preparation(
     if database_path.exists():
         database_path.unlink()
 
-    return results, images_dir, image_paths, feature_dir, database_path
+    path_dict = {"images_dir": images_dir, "image_paths": image_paths, "feature_dir": feature_dir, "database_path": database_path}
+    return path_dict, results
 
 
 def gpu_process(
-    image_paths: list[Path],
-    feature_dir: Path,
+    path_dict: dict,
     config: Config,
     device: torch.device,
 ) -> None:
+    image_paths = path_dict["image_paths"]
+    feature_dir = path_dict["feature_dir"]
+
     # 1. 似ていると思われる画像のペアを取得する
     distances, index_pairs = get_image_pairs(image_paths, **config.pair_matching_args, device=config.device)
     gc.collect()
@@ -63,16 +65,20 @@ def gpu_process(
 
 
 def cpu_process(
-    data_dict: dict[dict[str, list[Path]]],
-    images_dir: Path,
-    feature_dir: Path,
-    database_path: Path,
-    config: Config,
     results: dict,
-    dataset: str,
-    scene: str,
-    train_test: str,
+    prev_target_dict: dict,
+    path_dict: dict,
+    category: str,
+    config: Config,
 ) -> dict:
+    images_dir = path_dict["images_dir"]
+    feature_dir = path_dict["feature_dir"]
+    database_path = path_dict["database_path"]
+
+    data_dict = prev_target_dict["data_dict"]
+    dataset = prev_target_dict["dataset"]
+    scene = prev_target_dict["scene"]
+
     # 4.1. マッチングした特徴点の距離をcolmapにインポートする
     import_into_colmap(images_dir, feature_dir, database_path)
 
@@ -81,7 +87,6 @@ def cpu_process(
 
     # 4.2. RANSACを実行する（マッチングの外れ値を検出する）
     pycolmap.match_exhaustive(database_path, sift_options={"num_threads": 1})
-
     mapper_options = pycolmap.IncrementalPipelineOptions(**config.colmap_mapper_options)
 
     # 5.1 シーンの再構築を開始する（スパースな再構築）
@@ -91,7 +96,7 @@ def cpu_process(
     best_idx = find_optimal_reconstruction(maps)
 
     # 再構築オブジェクトを解析して、再構築における各画像の回転行列と並進ベクトルを取得する
-    results = parse_reconstructed_object(results, dataset, scene, maps, best_idx, train_test, config.base_path)
+    results = parse_reconstructed_object(results, dataset, scene, maps, best_idx, category, config.base_path)
     print(f"\n登録済み: {dataset} / {scene} -> {len(results[dataset][scene])} / {len(data_dict[dataset][scene])}")
 
     create_submission(results, data_dict, config.base_path)
@@ -105,10 +110,10 @@ def run_from_config(config: Config) -> None:
     is_remain_cpu_process = False
 
     if is_kaggle_notebook:
-        train_test = "test"
+        category = "test"
         data_dict = parse_sample_submission(config.base_path)
     else:
-        train_test = "train"
+        category = "train"
         data_dict = parse_train_labels(config.base_path)
 
     datasets = sorted(list(data_dict.keys()))
@@ -116,45 +121,36 @@ def run_from_config(config: Config) -> None:
     for dataset in datasets:
         if (not is_kaggle_notebook) and (dataset not in config.target_scene):
             continue
+
         if dataset not in results:
             results[dataset] = {}
+
         for scene in data_dict[dataset]:
             print(f"\n****** {dataset} ******")
-            results, images_dir, image_paths, feature_dir, database_path = preparation(data_dict, dataset, scene, results, config)
+            target_dict = {"data_dict": data_dict, "dataset": dataset, "scene": scene}
+            path_dict, results = preparation(target_dict, results, config)
+
             if not is_remain_cpu_process:
-                gpu_process(image_paths, feature_dir, config, device)
+                gpu_process(path_dict, config, device)
                 is_remain_cpu_process = True
-                prev_data_dict, prev_images_dir, prev_feature_dir, prev_dataset, prev_scene = data_dict, images_dir, feature_dir, dataset, scene
+                prev_paths_dict = path_dict
+                prev_target_dict = target_dict
 
             else:
                 with ThreadPoolExecutor(max_workers=2) as executor:
-                    future1 = executor.submit(gpu_process, image_paths, feature_dir, config, device)
-
-                    future2 = executor.submit(
-                        cpu_process,
-                        prev_data_dict,
-                        prev_images_dir,
-                        prev_feature_dir,
-                        database_path,
-                        config,
-                        results,
-                        prev_dataset,
-                        prev_scene,
-                        train_test,
-                    )
+                    future1 = executor.submit(gpu_process, path_dict, config, device)
+                    future2 = executor.submit(cpu_process, results, prev_target_dict, prev_paths_dict, category, config)
 
                     future_list = [future1, future2]
                     finished, pending = futures.wait(future_list, return_when=futures.ALL_COMPLETED)
                     is_remain_cpu_process = True
-                prev_data_dict, prev_images_dir, prev_feature_dir, prev_dataset, prev_scene = data_dict, images_dir, feature_dir, dataset, scene
+
+                prev_paths_dict = path_dict
+                prev_target_dict = target_dict
+
     if is_remain_cpu_process:
-        cpu_process(prev_data_dict, prev_images_dir, prev_feature_dir, database_path, config, results, prev_dataset, prev_scene, train_test)
+        cpu_process(results, prev_target_dict, prev_paths_dict, category, config)
 
     if not is_kaggle_notebook:
         print()
-        gt_csv = "/kaggle/input/image-matching-challenge-2024/train/train_labels.csv"
-        user_csv = "/kaggle/working/submission.csv"
-        gt_df = pd.read_csv(gt_csv).rename(columns={"image_name": "image_path"})
-        sub_df = pd.read_csv(user_csv)
-        sub_df["image_path"] = sub_df["image_path"].str.split("/").str[-1]
-        score(gt_df, sub_df, config.target_scene)
+        evaluate(config)
