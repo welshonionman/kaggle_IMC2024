@@ -29,7 +29,7 @@ def preparation(
     config: Config,
 ) -> tuple[dict, Path, list[Path], Path, Path]:
     images_dir = data_dict[dataset][scene][0].parent
-    image_paths = data_dict[dataset][scene][:4]
+    image_paths = data_dict[dataset][scene][:30]
     results[dataset][scene] = {}
 
     feature_dir = config.feature_dir / f"{dataset}_{scene}"
@@ -127,10 +127,25 @@ def run_from_config(config: Config) -> None:
                 prev_data_dict, prev_images_dir, prev_feature_dir, prev_dataset, prev_scene = data_dict, images_dir, feature_dir, dataset, scene
 
             else:
-                gpu_process(image_paths, feature_dir, config, device)
-                sleep(1)
+                with ThreadPoolExecutor(max_workers=2) as executor:
+                    future1 = executor.submit(gpu_process, image_paths, feature_dir, config, device)
 
-                cpu_process(prev_data_dict, prev_images_dir, prev_feature_dir, database_path, config, results, prev_dataset, prev_scene, train_test)
+                    future2 = executor.submit(
+                        cpu_process,
+                        prev_data_dict,
+                        prev_images_dir,
+                        prev_feature_dir,
+                        database_path,
+                        config,
+                        results,
+                        prev_dataset,
+                        prev_scene,
+                        train_test,
+                    )
+
+                    future_list = [future1, future2]
+                    finished, pending = futures.wait(future_list, return_when=futures.ALL_COMPLETED)
+                    is_remain_cpu_process = True
                 prev_data_dict, prev_images_dir, prev_feature_dir, prev_dataset, prev_scene = data_dict, images_dir, feature_dir, dataset, scene
     if is_remain_cpu_process:
         cpu_process(prev_data_dict, prev_images_dir, prev_feature_dir, database_path, config, results, prev_dataset, prev_scene, train_test)
