@@ -9,3 +9,5 @@ input/**
 __pycache__
 kaggle.json
 utils.ipynb
+.sample
+reference
