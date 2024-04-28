@@ -7,6 +7,8 @@ import torch
 import pycolmap
 import sys
 import pandas as pd
+from concurrent.futures import ThreadPoolExecutor
+from concurrent import futures
 
 from src.pair_match import get_image_pairs
 from src.keypoint import detect_keypoints, keypoint_distances
@@ -99,8 +101,9 @@ def cpu_process(
 def run_from_config(config: Config) -> None:
     device = K.utils.get_cuda_device_if_available(0)
     results = {}
-
     is_kaggle_notebook = "kaggle_web_client" in sys.modules
+    is_remain_cpu_process = False
+
     if is_kaggle_notebook:
         train_test = "test"
         data_dict = parse_sample_submission(config.base_path)
@@ -118,11 +121,19 @@ def run_from_config(config: Config) -> None:
         for scene in data_dict[dataset]:
             print(f"\n****** {dataset} ******")
             results, images_dir, image_paths, feature_dir, database_path = preparation(data_dict, dataset, scene, results, config)
+            if not is_remain_cpu_process:
+                gpu_process(image_paths, feature_dir, config, device)
+                is_remain_cpu_process = True
+                prev_data_dict, prev_images_dir, prev_feature_dir, prev_dataset, prev_scene = data_dict, images_dir, feature_dir, dataset, scene
 
-            gpu_process(image_paths, feature_dir, config, device)
-            sleep(1)
+            else:
+                gpu_process(image_paths, feature_dir, config, device)
+                sleep(1)
 
-            cpu_process(data_dict, images_dir, feature_dir, database_path, config, results, dataset, scene, train_test)
+                cpu_process(prev_data_dict, prev_images_dir, prev_feature_dir, database_path, config, results, prev_dataset, prev_scene, train_test)
+                prev_data_dict, prev_images_dir, prev_feature_dir, prev_dataset, prev_scene = data_dict, images_dir, feature_dir, dataset, scene
+    if is_remain_cpu_process:
+        cpu_process(prev_data_dict, prev_images_dir, prev_feature_dir, database_path, config, results, prev_dataset, prev_scene, train_test)
 
     if not is_kaggle_notebook:
         print()
