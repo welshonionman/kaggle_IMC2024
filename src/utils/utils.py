@@ -33,7 +33,7 @@ def set_seed(seed=42, cudnn_deterministic=True):
 def import_into_colmap(
     path: Path,
     feature_dir: Path,
-    database_path: str = "colmap.db",
+    database_path: Path,
 ) -> None:
     """Adds keypoints into colmap"""
     db = COLMAPDatabase.connect(database_path)

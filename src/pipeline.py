@@ -40,14 +40,14 @@ def gpu_process(
 
 
 def cpu_process(
-    images_dir,
-    feature_dir,
-    database_path,
-    config,
-    results,
-    dataset,
-    scene,
-    train_test,
+    images_dir: Path,
+    feature_dir: Path,
+    database_path: Path,
+    config: Config,
+    results: dict,
+    dataset: str,
+    scene: str,
+    train_test: str,
 ):
     # 4.1. マッチングした特徴点の距離をcolmapにインポートする
     import_into_colmap(images_dir, feature_dir, database_path)
@@ -94,7 +94,7 @@ def run_from_config(config: Config) -> None:
             images_dir = data_dict[dataset][scene][0].parent
             results[dataset][scene] = {}
             image_paths = data_dict[dataset][scene][:4]
-            print(f"\n[ {scene} ]: Got {len(image_paths)} images")
+            print(f"\n[{dataset:<33}]")
 
             feature_dir = config.feature_dir / f"{dataset}_{scene}"
             feature_dir.mkdir(parents=True, exist_ok=True)
