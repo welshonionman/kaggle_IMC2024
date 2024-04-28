@@ -110,7 +110,6 @@ def cpu_process(
 def run_from_config(config: Config) -> None:
     config.log_path.parent.mkdir(parents=True, exist_ok=True)
     print("", file=open(config.log_path, "w"))
-    start = time.time()
     results = {}
     is_remain_cpu_process = False
 
@@ -160,8 +159,4 @@ def run_from_config(config: Config) -> None:
         print()
         evaluate(config)
 
-    elapsed_time = time.time() - start
-    print(
-        f"\nelapsed_time: {elapsed_time:.2f} [sec]",
-        file=open(config.log_path, "a"),
-    )
+
