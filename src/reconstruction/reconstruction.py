@@ -11,7 +11,7 @@ def find_optimal_reconstruction(maps: dict) -> int:
 
     if isinstance(maps, dict):
         for idx1, rec in maps.items():
-            print(idx1, rec.summary())
+            print(rec.summary())
             try:
                 if len(rec.images) > images_registered:
                     images_registered = len(rec.images)
