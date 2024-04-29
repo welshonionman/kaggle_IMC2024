@@ -373,7 +373,7 @@ def score(solution: pd.DataFrame, submission: pd.DataFrame, config: Config) -> f
 
 
 def evaluate(config: Config):
-    gt_csv = "/kaggle/input/image-matching-challenge-2024/train/train_labels.csv"
+    gt_csv = config.gt_csv_path
     user_csv = "/kaggle/working/submission.csv"
     gt_df = pd.read_csv(gt_csv).rename(columns={"image_name": "image_path"})
     sub_df = pd.read_csv(user_csv)

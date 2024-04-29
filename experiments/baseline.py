@@ -12,19 +12,20 @@ warnings.filterwarnings("ignore")
 class Config:
     exp_name: str = __file__.split("/")[-1].replace(".py", "")
     is_kaggle_notebook: bool = any("KAGGLE" in item for item in dict(os.environ).keys())
-    valid_image_num: int = 20
+    valid_image_num: int = 9999  # validationに使用する画像数（デバッグ用）
     log_path = Path(f"/kaggle/log/{exp_name}.log")
+    gt_csv_path = Path("/kaggle/src/valid_gt.csv")
 
     base_path: Path = Path("/kaggle/input/image-matching-challenge-2024")
     feature_dir: Path = Path("/kaggle/.sample/")
     target_scene: list[str] = [
         "church",
         "dioscuri",
-        # "lizard",
+        "lizard",
         "multi-temporal-temple-baalshamin",
-        # "pond",
-        # "transp_obj_glass_cup",
-        # "transp_obj_glass_cylinder",
+        "pond",
+        "transp_obj_glass_cup",
+        "transp_obj_glass_cylinder",
     ]
     device: torch.device = K.utils.get_cuda_device_if_available(0)
 

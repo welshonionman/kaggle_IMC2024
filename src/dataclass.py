@@ -9,6 +9,7 @@ class Config:
     is_kaggle_notebook: bool
     valid_image_num: int
     log_path: Path
+    gt_csv_path: Path
 
     base_path: Path
     feature_dir: Path
