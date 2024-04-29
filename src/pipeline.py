@@ -116,11 +116,11 @@ def run_from_config(config: Config) -> None:
     if config.is_kaggle_notebook:
         category = "test"
         data_dict = parse_sample_submission(config.base_path, config)
+        datasets = sorted(list(data_dict.keys()))
     else:
         category = "train"
         data_dict = parse_train_labels(config.base_path, config)
-
-    datasets = sorted(list(data_dict.keys()))
+        datasets = sorted(data_dict, key=lambda x: len(data_dict[x][x]))
 
     for dataset in datasets:
         if (not config.is_kaggle_notebook) and (dataset not in config.target_scene):
@@ -158,5 +158,3 @@ def run_from_config(config: Config) -> None:
     if not config.is_kaggle_notebook:
         print()
         evaluate(config)
-
-
