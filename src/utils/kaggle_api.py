@@ -55,10 +55,10 @@ def pull_kernel(kernel, path="./"):
     shutil.move(f"./tmp/{fname}.ipynb", f"/kaggle/reference/{fname}.ipynb")
 
 
-def push_kernel(userid, path, datasets=[], comp=""):
+def push_kernel(userid, path, datasets=[], comp="", random_suffix=True):
     shutil.copy(path, "/tmp/tmp.ipynb")
     fname = Path(path)
-    rand = random.randint(1000, 9999)
+    rand = random.randint(1000, 9999) if random_suffix else ""
     with open("/kaggle/src/utils/kernel-metadata.json", "r") as js:
         dict_json = json.load(js)
     dict_json["id"] = f"{userid}/{fname.stem}{rand}"
