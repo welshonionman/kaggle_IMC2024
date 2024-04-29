@@ -11,7 +11,7 @@ warnings.filterwarnings("ignore")
 
 class Config:
     exp_name: str = __file__.split("/")[-1].replace(".py", "")
-    is_kaggle_notebook: bool = True
+    is_kaggle_notebook: bool = any("KAGGLE" in item for item in dict(os.environ).keys())
     valid_image_num: int = 20
     log_path = Path(f"/kaggle/log/{exp_name}.log")
 
