@@ -377,6 +377,7 @@ def evaluate(config: Config):
     user_csv = "/kaggle/working/submission.csv"
     gt_df = pd.read_csv(gt_csv).rename(columns={"image_name": "image_path"})
     sub_df = pd.read_csv(user_csv)
+    gt_df["image_path"] = gt_df["image_path"].str.split("/").str[-1]
     sub_df["image_path"] = sub_df["image_path"].str.split("/").str[-1]
     print("\n", file=open(config.log_path, "a"))
     score(gt_df, sub_df, config)

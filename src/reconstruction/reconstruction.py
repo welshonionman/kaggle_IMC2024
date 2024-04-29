@@ -7,11 +7,11 @@ from src.dataclass import Config
 def find_optimal_reconstruction(maps: dict, scene: str, config: Config) -> int:
     images_registered = 0
     best_idx = None
-
+    print(f"\n\n***** {scene} *****", file=open(config.log_path, "a"))
     if isinstance(maps, dict):
         for idx1, rec in maps.items():
             print(
-                f"\n\n***** {scene} *****\n{rec.summary()}",
+                rec.summary(),
                 file=open(config.log_path, "a"),
             )
             try:

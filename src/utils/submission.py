@@ -6,12 +6,8 @@ from src.dataclass import Config
 
 
 def parse_train_labels(base_path: Path, config: Config):
-    train_labels = pd.read_csv(base_path / "train/train_labels.csv")
-    train_labels["image_path"] = "train/" + train_labels["scene"] + "/images/" + train_labels["image_name"]
-    train_labels = train_labels[["image_path", "dataset", "scene", "rotation_matrix", "translation_vector"]]
+    train_labels = pd.read_csv(config.gt_csv_path)
 
-    duplicate = train_labels.duplicated(subset=["image_path", "scene"], keep="first")
-    train_labels = train_labels[~duplicate]
 
     data_dict = {}
     for i, row in enumerate(train_labels.itertuples()):
