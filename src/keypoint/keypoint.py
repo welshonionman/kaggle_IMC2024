@@ -21,7 +21,6 @@ def detect_keypoints(
     to be used later with LightGlue
     """
     dtype = torch.float32  # ALIKED has issues with float16
-    print(detection_threshold)
     extractor = ALIKED(max_num_keypoints=num_features, detection_threshold=detection_threshold, resize=resize_to).eval().to(device, dtype)
 
     feature_dir.mkdir(parents=True, exist_ok=True)
