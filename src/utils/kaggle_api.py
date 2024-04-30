@@ -69,11 +69,11 @@ def push_kernel(userid, path, datasets=[], comp="", random_suffix=True):
     dict_json["dataset_sources"] = datasets
     dict_json["language"] = "python"
     dict_json["kernel_type"] = "notebook"
-
+    os.chdir("/")
     with open("/kernel-metadata.json", "w") as js:
         json.dump(dict_json, js, indent=4)
     command = "kaggle kernels push"
-    subprocess.run(command, shell=True, check=True)
+    subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE)
     os.remove("/kernel-metadata.json")
 
 
