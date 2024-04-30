@@ -30,12 +30,12 @@ def parse_reconstructed_object(
     scene: str,
     maps: dict,
     best_idx: int,
-    category: str,
+    train_test: str,
     base_path: Path,
 ) -> dict:
     if best_idx is not None:
         for k, im in maps[best_idx].images.items():
-            key = base_path / category / scene / "images" / im.name
+            key = base_path / train_test / scene / "images" / im.name
             results[dataset][scene][key] = {}
             results[dataset][scene][key]["R"] = deepcopy(im.cam_from_world.rotation.matrix())
             results[dataset][scene][key]["t"] = deepcopy(np.array(im.cam_from_world.translation))

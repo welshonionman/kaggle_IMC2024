@@ -2,6 +2,8 @@ import os
 import time
 import numpy as np
 import random
+import pandas as pd
+from collections import defaultdict
 from pathlib import Path
 import torch
 import kornia as K
@@ -18,6 +20,16 @@ def load_torch_image(file_name: Path | str, device=torch.device("cpu")):
     """Loads an image and adds batch dimension"""
     img = K.io.load_image(file_name, K.io.ImageLoadType.RGB32, device=device)[None, ...]
     return img
+
+
+def cat2scenes(cat_csv_path):
+    cat2scenes_dict = defaultdict(list)
+    cat_df = pd.read_csv(cat_csv_path)
+    for row in cat_df.itertuples():
+        cats = row.categories.split(";")
+        for cat in cats:
+            cat2scenes_dict[cat].append(row.scene)
+    return dict(cat2scenes_dict)
 
 
 def set_seed(seed=42, cudnn_deterministic=True):

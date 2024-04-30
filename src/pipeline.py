@@ -11,7 +11,7 @@ from src.utils.submission import parse_sample_submission, create_submission, par
 from src.utils import import_into_colmap
 from src.utils.evaluate import evaluate
 from src.reconstruction import find_optimal_reconstruction, parse_reconstructed_object
-from src.utils.utils import timer
+from src.utils.utils import timer, cat2scenes
 
 pycolmap.logging.minloglevel = 3
 
@@ -68,7 +68,7 @@ def cpu_process(
     results: dict,
     prev_target_dict: dict,
     path_dict: dict,
-    category: str,
+    train_test: str,
     config: Config,
 ) -> dict:
     images_dir = path_dict["images_dir"]
@@ -96,7 +96,7 @@ def cpu_process(
     best_idx = find_optimal_reconstruction(maps, scene, config)
 
     # 再構築オブジェクトを解析して、再構築における各画像の回転行列と並進ベクトルを取得する
-    results = parse_reconstructed_object(results, dataset, scene, maps, best_idx, category, config.base_path)
+    results = parse_reconstructed_object(results, dataset, scene, maps, best_idx, train_test, config.base_path)
     print(
         f"\nRegistered: {dataset} / {scene} -> {len(results[dataset][scene])} / {len(data_dict[dataset][scene])}",
         file=open(config.log_path, "a"),
@@ -114,13 +114,16 @@ def run_from_config(config: Config) -> None:
     is_remain_cpu_process = False
 
     if config.is_kaggle_notebook:
-        category = "test"
+        train_test = "test"
         data_dict = parse_sample_submission(config.base_path, config)
         datasets = sorted(list(data_dict.keys()))
+
     else:
-        category = "train"
+        train_test = "train"
         data_dict = parse_train_labels(config.base_path, config)
         datasets = sorted(data_dict, key=lambda x: len(data_dict[x][x]))
+
+    cat2scenes_dict = cat2scenes(config.base_path / train_test / "categories.csv")
 
     for dataset in datasets:
         if (not config.is_kaggle_notebook) and (dataset not in config.target_scene):
@@ -143,7 +146,7 @@ def run_from_config(config: Config) -> None:
             else:
                 with ThreadPoolExecutor(max_workers=2) as executor:
                     future1 = executor.submit(gpu_process, path_dict, config)
-                    future2 = executor.submit(cpu_process, results, prev_target_dict, prev_paths_dict, category, config)
+                    future2 = executor.submit(cpu_process, results, prev_target_dict, prev_paths_dict, train_test, config)
 
                     future_list = [future1, future2]
                     finished, pending = futures.wait(future_list, return_when=futures.ALL_COMPLETED)
@@ -153,7 +156,7 @@ def run_from_config(config: Config) -> None:
                 prev_target_dict = target_dict
 
     if is_remain_cpu_process:
-        cpu_process(results, prev_target_dict, prev_paths_dict, category, config)
+        cpu_process(results, prev_target_dict, prev_paths_dict, train_test, config)
 
     if not config.is_kaggle_notebook:
         print()
