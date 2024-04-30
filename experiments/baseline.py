@@ -40,9 +40,10 @@ class Config:
     }
 
     # detect_keypoints function's arguments
-    keypoint_detection_args = {
-        "num_features": 4096,
+    aliked_config = {
+        "max_num_keypoints": 4096,
         "resize_to": 1024,
+        "detection_threshold": 0.01,
     }
 
     # keypoint_distances function's arguments
