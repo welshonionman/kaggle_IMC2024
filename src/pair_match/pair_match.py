@@ -10,7 +10,7 @@ from src.utils import load_torch_image
 
 
 def embed_images(
-    paths: list[Path],  # 処理する画像ファイルのパスリスト
+    image_paths: list[Path],  # 処理する画像ファイルのパスリスト
     model_name: str,  # 画像埋め込みに使用するモデル名
     device: torch.device = torch.device("cpu"),
 ) -> torch.Tensor:
@@ -23,7 +23,7 @@ def embed_images(
 
     embeddings = []
 
-    for i, path in tqdm(enumerate(paths), desc="Global descriptors"):
+    for i, path in tqdm(enumerate(image_paths), desc="Global descriptors"):
         image = load_torch_image(path)
 
         with torch.inference_mode():
@@ -44,7 +44,7 @@ def get_pairs_exhaustive(lst: list[Any]) -> list[tuple[int, int]]:
 
 
 def get_image_pairs(
-    paths: list[Path],
+    path_dict: dict[str, Path | list[Path]],
     model_name: str,
     similarity_threshold: float = 0.6,
     tolerance: int = 1000,
@@ -54,21 +54,21 @@ def get_image_pairs(
     device: torch.device = torch.device("cpu"),
 ) -> list[tuple[int, int]]:
     """類似した画像のペアを取得します"""
-
-    # if len(paths) <= exhaustive_if_less:
-    #     return get_pairs_exhaustive(paths)
+    image_paths = path_dict["image_paths"]
+    # if len(image_paths) <= exhaustive_if_less:
+    #     return get_pairs_exhaustive(image_paths)
 
     matches = []
 
     # 画像を埋め込み、フィルタリングのための距離を計算する
-    embeddings = embed_images(paths, model_name, device)  # shape: [len(filenames), output_dim]
+    embeddings = embed_images(image_paths, model_name, device)  # shape: [len(filenames), output_dim]
     distances = torch.cdist(embeddings, embeddings, p=p)  # shape: [len(filenames), len(filenames)]
 
     # 類似度閾値を超えるペアを削除する（十分な数がある場合）
     mask = distances <= similarity_threshold
-    image_indices = np.arange(len(paths))
+    image_indices = np.arange(len(image_paths))
 
-    for current_image_index in range(len(paths)):
+    for current_image_index in range(len(image_paths)):
         mask_row = mask[current_image_index]
         indices_to_match = image_indices[mask_row]
 

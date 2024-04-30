@@ -39,9 +39,8 @@ def detect_keypoints(
 
 
 def keypoint_distances(
-    image_paths: list[Path],
+    path_dict: dict[str, Path | list[Path]],
     index_pairs: list[tuple[int, int]],
-    feature_dir: Path,
     min_matches: int = 15,
     verbose: bool = True,
     device: torch.device = torch.device("cpu"),
@@ -50,7 +49,8 @@ def keypoint_distances(
 
     Stores output at feature_dir/matches.h5
     """
-
+    image_paths = path_dict["image_paths"]
+    feature_dir = path_dict["feature_dir"]
     matcher_params = {
         "width_confidence": -1,
         "depth_confidence": -1,
