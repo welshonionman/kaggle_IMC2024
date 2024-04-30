@@ -4,6 +4,13 @@ import torch
 
 
 @dataclass
+class ALIKEDConfig:
+    max_num_keypoints: int
+    detection_threshold: float
+    resize: int
+
+
+@dataclass
 class Config:
     exp_name: str
     is_kaggle_notebook: bool
@@ -18,7 +25,7 @@ class Config:
 
     pair_matching_args: dict
 
-    keypoint_detection_args: dict
+    aliked_config: ALIKEDConfig
 
     keypoint_distances_args: dict
 

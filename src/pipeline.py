@@ -1,6 +1,7 @@
 import time
 import gc
 import pycolmap
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 from concurrent import futures
 
@@ -44,7 +45,7 @@ def preparation(
 
 
 def gpu_process(
-    path_dict: dict,
+    path_dict: dict[str, Path | list[Path]],
     config: Config,
 ) -> None:
     image_paths = path_dict["image_paths"]
@@ -55,7 +56,7 @@ def gpu_process(
     gc.collect()
 
     # 2. すべての画像の特徴点を検出する
-    detect_keypoints(image_paths, feature_dir, **config.keypoint_detection_args, device=config.device)
+    detect_keypoints(path_dict, config)
     gc.collect()
 
     # 3. 似ている画像のペアの特徴点をマッチングする

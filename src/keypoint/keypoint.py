@@ -5,28 +5,22 @@ import h5py
 from lightglue import ALIKED
 import kornia.feature as KF
 from src.utils import load_torch_image
+from src.dataclass import ALIKEDConfig, Config
 
 
-def detect_keypoints(
-    paths: list[Path],
-    feature_dir: Path,
-    num_features: int = 4096,
-    detection_threshold: float = 0.01,
-    resize_to: int = 1024,
-    device: torch.device = torch.device("cpu"),
-) -> None:
-    """Detects the keypoints in a list of images with ALIKED
+def feature_ALIKED(path_dict: dict[str, Path | list[Path]], config: Config, aliked_config: ALIKEDConfig) -> None:
+    image_paths = path_dict["image_paths"]
+    feature_dir = path_dict["feature_dir"]
+    device = config.device
+    num_features = aliked_config["max_num_keypoints"]
+    detection_threshold = aliked_config["detection_threshold"]
+    resize_to = aliked_config["resize_to"]
 
-    Stores them in feature_dir/keypoints.h5 and feature_dir/descriptors.h5
-    to be used later with LightGlue
-    """
     dtype = torch.float32  # ALIKED has issues with float16
     extractor = ALIKED(max_num_keypoints=num_features, detection_threshold=detection_threshold, resize=resize_to).eval().to(device, dtype)
 
-    feature_dir.mkdir(parents=True, exist_ok=True)
-
     with h5py.File(feature_dir / "keypoints.h5", mode="w") as f_keypoints, h5py.File(feature_dir / "descriptors.h5", mode="w") as f_descriptors:
-        for path in tqdm(paths, desc="Computing keypoints"):
+        for path in tqdm(image_paths, desc="Computing keypoints / ALIKED"):
             key = path.name
 
             with torch.inference_mode():
@@ -37,8 +31,15 @@ def detect_keypoints(
                 f_descriptors[key] = features["descriptors"].squeeze().detach().cpu().numpy()
 
 
+def detect_keypoints(
+    path_dict: dict[str, Path | list[Path]],
+    config: Config,
+) -> None:
+    feature_ALIKED(path_dict, config, config.aliked_config)
+
+
 def keypoint_distances(
-    paths: list[Path],
+    image_paths: list[Path],
     index_pairs: list[tuple[int, int]],
     feature_dir: Path,
     min_matches: int = 15,
@@ -63,7 +64,7 @@ def keypoint_distances(
         h5py.File(feature_dir / "matches.h5", mode="w") as f_matches,
     ):
         for idx1, idx2 in tqdm(index_pairs, desc="Computing keypoing distances"):
-            key1, key2 = paths[idx1].name, paths[idx2].name
+            key1, key2 = image_paths[idx1].name, image_paths[idx2].name
 
             keypoints1 = torch.from_numpy(f_keypoints[key1][...]).to(device)
             keypoints2 = torch.from_numpy(f_keypoints[key2][...]).to(device)
