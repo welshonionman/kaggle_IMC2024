@@ -11,6 +11,7 @@ def detect_keypoints(
     paths: list[Path],
     feature_dir: Path,
     num_features: int = 4096,
+    detection_threshold: float = 0.01,
     resize_to: int = 1024,
     device: torch.device = torch.device("cpu"),
 ) -> None:
@@ -20,8 +21,8 @@ def detect_keypoints(
     to be used later with LightGlue
     """
     dtype = torch.float32  # ALIKED has issues with float16
-
-    extractor = ALIKED(max_num_keypoints=num_features, detection_threshold=0.01, resize=resize_to).eval().to(device, dtype)
+    print(detection_threshold)
+    extractor = ALIKED(max_num_keypoints=num_features, detection_threshold=detection_threshold, resize=resize_to).eval().to(device, dtype)
 
     feature_dir.mkdir(parents=True, exist_ok=True)
 
