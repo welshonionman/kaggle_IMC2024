@@ -30,3 +30,5 @@ class Config:
     keypoint_distances_args: dict
 
     colmap_mapper_options: dict
+
+    rotate: bool
