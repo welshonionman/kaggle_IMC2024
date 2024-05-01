@@ -1,8 +1,8 @@
+import cv2
 from pathlib import Path
 import numpy as np
 import torch
 import albumentations as albu
-from PIL import Image
 from check_orientation.pre_trained_models import create_model
 
 
@@ -12,7 +12,8 @@ def tensor_from_rgb_image(image: np.ndarray) -> torch.Tensor:
 
 
 def detect_rot(img_path: Path):
-    img = np.array(Image.open(img_path))
+    img = cv2.cvtColor(cv2.imread(str(img_path), -1), cv2.COLOR_BGR2RGB)
+    # img = np.array(Image.open(img_path))
     model = create_model("swsl_resnext50_32x4d")
     model.eval()
     transform = albu.Compose([albu.Resize(height=224, width=224), albu.Normalize(p=1)], p=1)
