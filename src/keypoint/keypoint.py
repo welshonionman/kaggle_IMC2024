@@ -8,7 +8,11 @@ from src.utils import load_torch_image
 from src.dataclass import ALIKEDConfig, Config
 
 
-def feature_ALIKED(path_dict: dict[str, Path | list[Path]], config: Config, aliked_config: ALIKEDConfig) -> None:
+def feature_ALIKED(
+    path_dict: dict[str, Path | list[Path]],
+    config: Config,
+    aliked_config: ALIKEDConfig,
+) -> None:
     image_paths = path_dict["image_paths"]
     feature_dir = path_dict["feature_dir"]
     device = config.device
