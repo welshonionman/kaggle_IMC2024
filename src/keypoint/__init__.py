@@ -1,1 +1,2 @@
-from .keypoint import keypoint_distances, detect_keypoints
+from .detect import detect_keypoints
+from .match import match_keypoints

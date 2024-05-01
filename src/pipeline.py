@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from concurrent import futures
 
 from src.pair_match import get_image_pairs
-from src.keypoint import detect_keypoints, keypoint_distances
+from src.keypoint import detect_keypoints, match_keypoints
 from src.dataclass import Config
 from src.utils.submission import parse_sample_submission, create_submission, parse_train_labels
 from src.utils import import_into_colmap
@@ -57,7 +57,7 @@ def gpu_process(
     gc.collect()
 
     # 3. 似ている画像のペアの特徴点をマッチングする
-    keypoint_distances(path_dict, index_pairs, **config.keypoint_distances_args, device=config.device)
+    match_keypoints(path_dict, index_pairs, **config.keypoint_distances_args, device=config.device)
     gc.collect()
     return
 
