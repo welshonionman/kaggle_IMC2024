@@ -75,7 +75,7 @@ def add_keypoints(db, h5_path, image_path, img_ext, camera_model, single_camera=
 
     camera_id = None
     fname_to_id = {}
-    for filename in tqdm(list(keypoint_f.keys())):
+    for filename in tqdm(list(keypoint_f.keys()), desc="Adding keypoints"):
         keypoints = keypoint_f[filename][()]
 
         fname_with_ext = filename  # + img_ext
@@ -97,27 +97,22 @@ def add_matches(db, h5_path, fname_to_id):
     match_file = h5py.File(os.path.join(h5_path, "matches.h5"), "r")
 
     added = set()
-    n_keys = len(match_file.keys())
-    n_total = (n_keys * (n_keys - 1)) // 2
 
-    with tqdm(total=n_total) as pbar:
-        for key_1 in match_file.keys():
-            group = match_file[key_1]
-            for key_2 in group.keys():
-                id_1 = fname_to_id[key_1]
-                id_2 = fname_to_id[key_2]
+    for key_1 in tqdm(match_file.keys(), desc="Adding matches"):
+        group = match_file[key_1]
+        for key_2 in group.keys():
+            id_1 = fname_to_id[key_1]
+            id_2 = fname_to_id[key_2]
 
-                pair_id = image_ids_to_pair_id(id_1, id_2)
-                if pair_id in added:
-                    warnings.warn(f"Pair {pair_id} ({id_1}, {id_2}) already added!")
-                    continue
+            pair_id = image_ids_to_pair_id(id_1, id_2)
+            if pair_id in added:
+                warnings.warn(f"Pair {pair_id} ({id_1}, {id_2}) already added!")
+                continue
 
-                matches = group[key_2][()]
-                db.add_matches(id_1, id_2, matches)
+            matches = group[key_2][()]
+            db.add_matches(id_1, id_2, matches)
 
-                added.add(pair_id)
-
-                pbar.update(1)
+            added.add(pair_id)
 
 
 def import_into_colmap(img_dir, feature_dir=".featureout", database_path="colmap.db", img_ext=".jpg"):

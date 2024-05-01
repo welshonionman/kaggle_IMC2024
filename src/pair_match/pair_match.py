@@ -23,7 +23,7 @@ def embed_images(
 
     embeddings = []
 
-    for i, path in tqdm(enumerate(image_paths), desc="Global descriptors"):
+    for i, path in enumerate(tqdm(image_paths, desc="Global descriptors")):
         image = load_torch_image(path)
 
         with torch.inference_mode():

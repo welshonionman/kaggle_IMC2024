@@ -30,7 +30,7 @@ def match_keypoints(
         h5py.File(feature_dir / "descriptors.h5", mode="r") as f_descriptors,
         h5py.File(feature_dir / "matches.h5", mode="w") as f_matches,
     ):
-        for idx1, idx2 in tqdm(index_pairs, desc="Computing keypoing distances"):
+        for idx1, idx2 in tqdm(index_pairs, desc="Matching keypoing"):
             key1, key2 = image_paths[idx1].name, image_paths[idx2].name
 
             keypoints1 = torch.from_numpy(f_keypoints[key1][...]).to(device)

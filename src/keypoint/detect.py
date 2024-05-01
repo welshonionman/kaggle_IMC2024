@@ -19,7 +19,7 @@ def save_features(
     is_rotate = getattr(config, "rotate", False)
 
     with h5py.File(feature_dir / "keypoints.h5", mode="w") as f_keypoints, h5py.File(feature_dir / "descriptors.h5", mode="w") as f_descriptors:
-        for path in tqdm(image_paths, desc="Computing keypoints / ALIKED"):
+        for path in tqdm(image_paths, desc="Detecting keypoints / ALIKED"):
             key = path.name
 
             with torch.inference_mode():
