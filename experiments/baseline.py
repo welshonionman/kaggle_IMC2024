@@ -2,9 +2,10 @@ import torch
 import shutil
 from pathlib import Path
 import kornia as K
-from src.pipeline import run_from_config
 import os
 import warnings
+from src.pipeline import run_from_config
+from src.utils.utils import cat2scenes
 
 warnings.filterwarnings("ignore")
 
@@ -12,12 +13,16 @@ warnings.filterwarnings("ignore")
 class Config:
     exp_name: str = __file__.split("/")[-1].replace(".py", "")
     is_kaggle_notebook: bool = any("KAGGLE" in item for item in dict(os.environ).keys())
+    train_test = "test" if is_kaggle_notebook else "train"
+
     valid_image_num: int = 9999  # validationに使用する画像数（デバッグ用）
     log_path = Path(f"/kaggle/log/{exp_name}.log")
     gt_csv_path = Path("/kaggle/src/valid_gt.csv")
 
     base_path: Path = Path("/kaggle/input/image-matching-challenge-2024")
     feature_dir: Path = Path("/kaggle/.sample/")
+    cat2scenes_dict = cat2scenes(base_path / train_test / "categories.csv")
+
     target_scene: list[str] = [
         "church",
         "dioscuri",
@@ -58,6 +63,8 @@ class Config:
         "max_num_models": 2,
         "num_threads": 1,
     }
+    
+    rotate: bool = True
 
 
 if __name__ == "__main__":
