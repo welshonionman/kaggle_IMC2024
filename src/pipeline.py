@@ -45,12 +45,13 @@ def preparation(
 
 def gpu_process(
     path_dict: dict[str, Path | list[Path]],
+    scene: str,
     config: Config,
 ) -> None:
     distances, index_pairs = get_image_pairs(path_dict, **config.pair_matching_args, device=config.device)
     gc.collect()
 
-    detect_keypoints(path_dict, config)
+    detect_keypoints(path_dict, scene, config)
     gc.collect()
 
     match_keypoints(path_dict, index_pairs, **config.keypoint_distances_args, device=config.device)
@@ -127,14 +128,14 @@ def run_from_config(config: Config) -> None:
             path_dict, results = preparation(target_dict, results, config)
 
             if not is_remain_cpu_process:
-                gpu_process(path_dict, config)
+                gpu_process(path_dict, scene, config)
                 is_remain_cpu_process = True
                 prev_paths_dict = path_dict
                 prev_target_dict = target_dict
 
             else:
                 with ThreadPoolExecutor(max_workers=2) as executor:
-                    future1 = executor.submit(gpu_process, path_dict, config)
+                    future1 = executor.submit(gpu_process, path_dict, scene, config)
                     future2 = executor.submit(cpu_process, results, prev_target_dict, prev_paths_dict, config)
 
                     future_list = [future1, future2]

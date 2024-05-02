@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import albumentations as albu
 from check_orientation.pre_trained_models import create_model
+from src.dataclass import Config
 
 
 def tensor_from_rgb_image(image: np.ndarray) -> torch.Tensor:
@@ -48,3 +49,19 @@ def rotate_kpts(kpts, im_shape, k):
         raise ValueError(f"Unknown rotation {k}")
 
     return rot_kpts
+
+
+def apply_rotate(
+    path: Path,
+    image: torch.Tensor,
+    extractor: torch.nn.Module,
+    config: Config,
+):
+    correct_rot = detect_rot(path)
+    image = torch.rot90(image, correct_rot, dims=(2, 3))
+    features = extractor.extract(image)
+    tmp_np = features["keypoints"][0].cpu().numpy()
+    rot_kpts = rotate_kpts(tmp_np, (image.shape[3], image.shape[2]), correct_rot)
+    keypoints_rot = torch.from_numpy(rot_kpts).unsqueeze(0).to(config.device)
+    features["keypoints"] = keypoints_rot
+    return features

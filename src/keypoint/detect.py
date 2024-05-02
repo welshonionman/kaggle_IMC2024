@@ -4,13 +4,14 @@ import torch
 import h5py
 from lightglue import ALIKED
 from src.utils import load_torch_image
-from src.dataclass import ALIKEDConfig, Config
-from src.keypoint.rotate import detect_rot, rotate_kpts
+from src.dataclass import Config
+from src.keypoint.rotate import apply_rotate
 
 
 def save_features(
     extractor,
     path_dict: dict[str, Path | list[Path]],
+    scene: str,
     config: Config,
 ) -> None:
     image_paths = path_dict["image_paths"]
@@ -23,26 +24,20 @@ def save_features(
 
             with torch.inference_mode():
                 image = load_torch_image(path, device=config.device).to(torch.float32)
-                if is_rotate:
-                    correct_rot = detect_rot(path)
-                    image = torch.rot90(image, correct_rot, dims=(2, 3))
-
-                features = extractor.extract(image)
-
-                if is_rotate:
-                    tmp_np = features["keypoints"][0].cpu().numpy()
-                    rot_kpts = rotate_kpts(tmp_np, (image.shape[3], image.shape[2]), correct_rot)
-                    keypoints_rot = torch.from_numpy(rot_kpts).unsqueeze(0).to(config.device)
-                    features["keypoints"] = keypoints_rot
+                if is_rotate and scene in config.cat2scenes_dict["air-to-ground"]:
+                    features = apply_rotate(path, image, extractor, config)
+                else:
+                    features = extractor.extract(image)
                 f_keypoints[key] = features["keypoints"].squeeze().detach().cpu().numpy()
                 f_descriptors[key] = features["descriptors"].squeeze().detach().cpu().numpy()
 
 
 def feature_ALIKED(
     path_dict: dict[str, Path | list[Path]],
+    scene: str,
     config: Config,
-    aliked_config: ALIKEDConfig,
 ) -> None:
+    aliked_config = config.aliked_config
     extractor = (
         ALIKED(
             max_num_keypoints=aliked_config["max_num_keypoints"],
@@ -53,11 +48,12 @@ def feature_ALIKED(
         .to(config.device, torch.float32)
     )
 
-    save_features(extractor, path_dict, config)
+    save_features(extractor, path_dict, scene, config)
 
 
 def detect_keypoints(
     path_dict: dict[str, Path | list[Path]],
+    scene: str,
     config: Config,
 ) -> None:
-    feature_ALIKED(path_dict, config, config.aliked_config)
+    feature_ALIKED(path_dict, scene, config)
