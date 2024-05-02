@@ -11,6 +11,11 @@ class ALIKEDConfig:
 
 
 @dataclass
+class DeDoDev2Config:
+    pass
+
+
+@dataclass
 class Config:
     exp_name: str
     is_kaggle_notebook: bool
@@ -28,7 +33,9 @@ class Config:
 
     pair_matching_args: dict
 
+    detector: list[str]
     aliked_config: ALIKEDConfig
+    dedodev2_config: DeDoDev2Config
 
     keypoint_distances_args: dict
 
