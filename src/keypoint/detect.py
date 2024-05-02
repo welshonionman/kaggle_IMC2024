@@ -24,7 +24,8 @@ def save_features(
 
             with torch.inference_mode():
                 image = load_torch_image(path, device=config.device).to(torch.float32)
-                if is_rotate and scene in config.cat2scenes_dict["air-to-ground"]:
+                if is_rotate and ("air-to-ground" in config.cat2scenes_dict) and (scene in config.cat2scenes_dict["air-to-ground"]):
+                    print("apply rotate")
                     features = apply_rotate(path, image, extractor, config)
                 else:
                     features = extractor.extract(image)
