@@ -1,4 +1,3 @@
-from pathlib import Path
 from copy import deepcopy
 import numpy as np
 from src.dataclass import Config
@@ -30,9 +29,10 @@ def parse_reconstructed_object(
     scene: str,
     maps: dict,
     best_idx: int,
-    train_test: str,
-    base_path: Path,
+    config: Config,
 ) -> dict:
+    base_path = config.base_path
+    train_test = config.train_test
     if best_idx is not None:
         for k, im in maps[best_idx].images.items():
             key = base_path / train_test / scene / "images" / im.name

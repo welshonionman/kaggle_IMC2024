@@ -3,7 +3,6 @@ from pathlib import Path
 import torch
 import h5py
 from lightglue import ALIKED
-import kornia.feature as KF
 from src.utils import load_torch_image
 from src.dataclass import ALIKEDConfig, Config
 from src.keypoint.rotate import detect_rot, rotate_kpts
