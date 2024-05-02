@@ -22,7 +22,7 @@ def load_torch_image(file_name: Path | str, device=torch.device("cpu")):
     return img
 
 
-def cat2scenes(cat_csv_path):
+def cat2scenes(cat_csv_path: Path) -> dict[str, list[str]]:
     cat2scenes_dict = defaultdict(list)
     cat_df = pd.read_csv(cat_csv_path)
     for row in cat_df.itertuples():

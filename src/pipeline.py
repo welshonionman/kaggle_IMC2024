@@ -48,15 +48,12 @@ def gpu_process(
     path_dict: dict[str, Path | list[Path]],
     config: Config,
 ) -> None:
-    # 1. 似ていると思われる画像のペアを取得する
     distances, index_pairs = get_image_pairs(path_dict, **config.pair_matching_args, device=config.device)
     gc.collect()
 
-    # 2. すべての画像の特徴点を検出する
     detect_keypoints(path_dict, config)
     gc.collect()
 
-    # 3. 似ている画像のペアの特徴点をマッチングする
     match_keypoints(path_dict, index_pairs, **config.keypoint_distances_args, device=config.device)
     gc.collect()
     return
