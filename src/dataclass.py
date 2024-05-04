@@ -42,3 +42,6 @@ class Config:
     colmap_mapper_options: dict
 
     rotate: bool
+
+    keypoint_viz: bool
+    keypoint_viz_dir: Path

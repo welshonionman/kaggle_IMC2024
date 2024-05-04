@@ -8,7 +8,7 @@ from src.pair_match import get_image_pairs
 from src.keypoint import detect_keypoints, match_keypoints
 from src.dataclass import Config
 from src.utils.submission import parse_sample_submission, create_submission, parse_train_labels
-from src.utils import import_into_colmap
+from src.utils import import_into_colmap, preparation
 from src.utils.evaluate import evaluate
 from src.reconstruction import find_optimal_reconstruction, parse_reconstructed_object
 from src.utils.utils import timer

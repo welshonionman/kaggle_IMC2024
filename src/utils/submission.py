@@ -6,8 +6,11 @@ from src.dataclass import Config
 
 
 def parse_train_labels(base_path: Path, config: Config):
-    train_labels = pd.read_csv(config.gt_csv_path)
-
+    if not config.is_kaggle_notebook and config.keypoint_viz:
+        train_labels = pd.read_csv(f"{base_path}/train/train_labels.csv")
+        train_labels["image_path"] = "train/" + train_labels["scene"] + "/images/" + train_labels["image_name"]
+    else:
+        train_labels = pd.read_csv(config.gt_csv_path)
 
     data_dict = {}
     for i, row in enumerate(train_labels.itertuples()):
