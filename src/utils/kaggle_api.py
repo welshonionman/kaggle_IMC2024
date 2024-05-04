@@ -43,7 +43,7 @@ def create_datasets(userid, folder):
     with open(f"{folder}/dataset-metadata.json", "w") as js:
         json.dump(dict_json, js, indent=4)
 
-    command = f"kaggle datasets create -p {folder} --quiet"
+    command = f"kaggle datasets create -p {folder} --quiet --dir-mode tar"
     subprocess.run(command, shell=True, check=True)
 
 
