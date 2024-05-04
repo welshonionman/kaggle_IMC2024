@@ -45,6 +45,7 @@ class Config:
     }
 
     # detect_keypoints function's arguments
+    detector = ["ALIKED"]
     aliked_config = {
         "max_num_keypoints": 4096,
         "resize_to": 1024,
@@ -63,8 +64,8 @@ class Config:
         "max_num_models": 2,
         "num_threads": 1,
     }
-    
-    rotate: bool = True
+
+    rotate: bool = False
 
 
 if __name__ == "__main__":
