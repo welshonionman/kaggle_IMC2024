@@ -3,27 +3,32 @@ from pathlib import Path
 import torch
 import h5py
 import kornia.feature as KF
+from src.dataclass import Config
+
+
+model_dict = {
+    "ALIKED": "aliked",
+    "DeDoDe": "dedodeg",
+}
 
 
 def match_keypoints(
     path_dict: dict[str, Path | list[Path]],
     index_pairs: list[tuple[int, int]],
-    min_matches: int = 15,
-    verbose: bool = True,
-    device: torch.device = torch.device("cpu"),
+    config: Config,
 ) -> None:
-    """Computes distances between keypoints of images.
-
-    Stores output at feature_dir/matches.h5
-    """
     image_paths = path_dict["image_paths"]
     feature_dir = path_dict["feature_dir"]
+    min_matches = config.keypoint_distances_args["min_matches"]
+    verbose = config.keypoint_distances_args["verbose"]
+
     matcher_params = {
         "width_confidence": -1,
         "depth_confidence": -1,
-        "mp": True if "cuda" in str(device) else False,
+        "mp": True if "cuda" in str(config.device) else False,
     }
-    matcher = KF.LightGlueMatcher("aliked", matcher_params).eval().to(device)
+    model = model_dict[config.detector[0]]
+    matcher = KF.LightGlueMatcher(model, matcher_params).eval().to(config.device)
 
     with (
         h5py.File(feature_dir / "keypoints.h5", mode="r") as f_keypoints,
@@ -33,10 +38,10 @@ def match_keypoints(
         for idx1, idx2 in tqdm(index_pairs, desc="Matching keypoing"):
             key1, key2 = image_paths[idx1].name, image_paths[idx2].name
 
-            keypoints1 = torch.from_numpy(f_keypoints[key1][...]).to(device)
-            keypoints2 = torch.from_numpy(f_keypoints[key2][...]).to(device)
-            descriptors1 = torch.from_numpy(f_descriptors[key1][...]).to(device)
-            descriptors2 = torch.from_numpy(f_descriptors[key2][...]).to(device)
+            keypoints1 = torch.from_numpy(f_keypoints[key1][...]).to(config.device)
+            keypoints2 = torch.from_numpy(f_keypoints[key2][...]).to(config.device)
+            descriptors1 = torch.from_numpy(f_descriptors[key1][...]).to(config.device)
+            descriptors2 = torch.from_numpy(f_descriptors[key2][...]).to(config.device)
 
             with torch.inference_mode():
                 distances, indices = matcher(

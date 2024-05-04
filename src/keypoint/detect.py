@@ -43,6 +43,37 @@ def feature_ALIKED(
                 f_descriptors[key] = features["descriptors"].squeeze().detach().cpu().numpy()
 
 
+def feature_DeDoDe(
+    path_dict: dict[str, Path | list[Path]],
+    scene: str,
+    config: Config,
+) -> None:
+    image_paths = path_dict["image_paths"]
+    feature_dir = path_dict["feature_dir"]
+    is_rotate = getattr(config, "rotate", False)
+    detector = (
+        KF.DeDoDe()
+        .from_pretrained(
+            detector_weights="L-upright",
+            descriptor_weights="B-upright",
+        )
+        .eval()
+        .to(config.device, torch.float16)
+    )
+
+    with h5py.File(feature_dir / "keypoints.h5", mode="w") as f_keypoints, h5py.File(feature_dir / "descriptors.h5", mode="w") as f_descriptors:
+        for path in tqdm(image_paths, desc="Detecting keypoints / DeDoDe"):
+            key = path.name
+            with torch.inference_mode():
+                image = load_torch_image(path, device=config.device).to(torch.float16)
+                if is_rotate and ("air-to-ground" in config.cat2scenes_dict) and (scene in config.cat2scenes_dict["air-to-ground"]):
+                    features = apply_rotate(path, image, detector, config)
+                else:
+                    keypoints, scores, features = detector(image)
+                f_keypoints[key] = keypoints.squeeze().detach().cpu().numpy()
+                f_descriptors[key] = features.squeeze().detach().cpu().numpy()
+
+
 def detect_keypoints(
     path_dict: dict[str, Path | list[Path]],
     scene: str,
@@ -52,6 +83,9 @@ def detect_keypoints(
 
     if "ALIKED" in config.detector:
         feature_ALIKED(path_dict, scene, config)
+        detected = True
+    if "DeDoDe" in config.detector:
+        feature_DeDoDe(path_dict, scene, config)
         detected = True
     if not detected:
         raise ValueError("No detector specified")

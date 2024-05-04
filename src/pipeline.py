@@ -54,7 +54,7 @@ def gpu_process(
     detect_keypoints(path_dict, scene, config)
     gc.collect()
 
-    match_keypoints(path_dict, index_pairs, **config.keypoint_distances_args, device=config.device)
+    match_keypoints(path_dict, index_pairs, config)
     gc.collect()
     return
 
