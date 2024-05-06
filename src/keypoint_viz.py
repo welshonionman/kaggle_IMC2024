@@ -15,13 +15,10 @@ def keypoint_viz_save(
 ):
     save_path.parent.mkdir(parents=True, exist_ok=True)
 
-    dpi = 100
-    b, c, h, w = image.shape
-
     image = image[0, ...].permute(1, 2, 0).cpu()
     keypoints = keypoints.cpu()
 
-    plt.figure(figsize=(w / dpi, h / dpi), dpi=dpi)
+    plt.figure(figsize=(10, 10))
     plt.imshow(image)
     plt.scatter(keypoints[0, :, 0], keypoints[0, :, 1], s=0.5, c="red")
     plt.axis("off")

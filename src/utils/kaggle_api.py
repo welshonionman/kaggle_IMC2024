@@ -34,7 +34,7 @@ def download_datasets(dataset):
 
 
 def create_datasets(userid, folder):
-    title = folder.rstrip("/").split("/")[-1]
+    title = folder.rstrip("/").split("/")[-1].replace("_", "-")
     print(title)
     with open("/kaggle/src/utils/dataset-metadata.json", "r") as js:
         dict_json = json.load(js)
@@ -43,7 +43,7 @@ def create_datasets(userid, folder):
     with open(f"{folder}/dataset-metadata.json", "w") as js:
         json.dump(dict_json, js, indent=4)
 
-    command = f"kaggle datasets create -p {folder} --quiet --dir-mode tar"
+    command = f"kaggle datasets create -p {folder} --quiet --dir-mode zip"
     subprocess.run(command, shell=True, check=True)
 
 
