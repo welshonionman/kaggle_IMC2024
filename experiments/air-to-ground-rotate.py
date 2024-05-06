@@ -6,6 +6,7 @@ import os
 import warnings
 from src.pipeline import run_from_config
 from src.utils.utils import cat2scenes
+from src.keypoint_viz import keypoint_viz
 
 warnings.filterwarnings("ignore")
 
@@ -67,7 +68,13 @@ class Config:
 
     rotate: bool = True
 
+    keypoint_viz: bool = False
+    keypoint_viz_dir: Path = Path(f"/kaggle/eda/keypoint_viz/{exp_name}")
+
 
 if __name__ == "__main__":
-    shutil.rmtree(Config.feature_dir, ignore_errors=True)
-    run_from_config(config=Config)
+    if (Config.keypoint_viz) and (not Config.is_kaggle_notebook):
+        keypoint_viz(Config)
+    else:
+        shutil.rmtree(Config.feature_dir, ignore_errors=True)
+        run_from_config(config=Config)
