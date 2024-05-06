@@ -16,31 +16,7 @@ from src.utils.utils import timer
 pycolmap.logging.minloglevel = 3
 
 
-def preparation(
-    target_dict: dict,
-    results: dict,
-    config: Config,
-) -> tuple[dict, dict]:
-    data_dict = target_dict["data_dict"]
-    dataset = target_dict["dataset"]
-    scene = target_dict["scene"]
 
-    images_dir = data_dict[dataset][scene][0].parent
-    image_paths = data_dict[dataset][scene]
-    if not config.is_kaggle_notebook:
-        image_paths = image_paths[: config.valid_image_num]
-
-    results[dataset][scene] = {}
-
-    feature_dir = config.feature_dir / f"{dataset}_{scene}"
-    feature_dir.mkdir(parents=True, exist_ok=True)
-
-    database_path = feature_dir / "colmap.db"
-    if database_path.exists():
-        database_path.unlink()
-
-    path_dict = {"images_dir": images_dir, "image_paths": image_paths, "feature_dir": feature_dir, "database_path": database_path}
-    return path_dict, results
 
 
 def gpu_process(
