@@ -35,6 +35,7 @@ class Config:
 
     detector: list[str]
     aliked_config: ALIKEDConfig
+    aliked_config_transparent: ALIKEDConfig
     dedodev2_config: DeDoDev2Config
 
     keypoint_distances_args: dict
@@ -42,6 +43,7 @@ class Config:
     colmap_mapper_options: dict
 
     rotate: bool
+    detector_transp: bool
 
     keypoint_viz: bool
     keypoint_viz_dir: Path
