@@ -6,6 +6,7 @@ import os
 import warnings
 from src.pipeline import run_from_config
 from src.utils.utils import cat2scenes
+from src.keypoint_viz import keypoint_viz
 
 warnings.filterwarnings("ignore")
 
@@ -27,10 +28,10 @@ class Config:
         "church",
         "dioscuri",
         "lizard",
-        # "multi-temporal-temple-baalshamin",
+        "multi-temporal-temple-baalshamin",
         "pond",
-        # "transp_obj_glass_cup",
-        # "transp_obj_glass_cylinder",
+        "transp_obj_glass_cup",
+        "transp_obj_glass_cylinder",
     ]
     device: torch.device = K.utils.get_cuda_device_if_available(0)
 
@@ -45,7 +46,8 @@ class Config:
     }
 
     # detect_keypoints function's arguments
-    detector = ["DeDoDe"]
+    detector = ["ALIKED"]
+
     aliked_config = {
         "max_num_keypoints": 4096,
         "resize_to": 1024,
@@ -65,9 +67,16 @@ class Config:
         "num_threads": 1,
     }
 
-    rotate: bool = False
+    rotate: bool = True
+    detector_transp: bool = False
+
+    keypoint_viz: bool = False
+    keypoint_viz_dir: Path = Path(f"/kaggle/eda/keypoint_viz/{exp_name}")
 
 
 if __name__ == "__main__":
-    shutil.rmtree(Config.feature_dir, ignore_errors=True)
-    run_from_config(config=Config)
+    if (Config.keypoint_viz) and (not Config.is_kaggle_notebook):
+        keypoint_viz(Config)
+    else:
+        shutil.rmtree(Config.feature_dir, ignore_errors=True)
+        run_from_config(config=Config)

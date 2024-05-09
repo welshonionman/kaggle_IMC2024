@@ -1,0 +1,94 @@
+
+church / church -> 110 images
+dioscuri / dioscuri -> 70 images
+lizard / lizard -> 110 images
+multi-temporal-temple-baalshamin / multi-temporal-temple-baalshamin -> 66 images
+pond / pond -> 110 images
+transp_obj_glass_cup / transp_obj_glass_cup -> 36 images
+transp_obj_glass_cylinder / transp_obj_glass_cylinder -> 36 images
+
+
+***** dioscuri *****
+Reconstruction:
+	num_reg_images = 3
+	num_cameras = 3
+	num_points3D = 1453
+	num_observations = 3262
+	mean_track_length = 2.24501
+	mean_observations_per_image = 1087.33
+	mean_reprojection_error = 0.619857
+Reconstruction:
+	num_reg_images = 4
+	num_cameras = 4
+	num_points3D = 1109
+	num_observations = 2459
+	mean_track_length = 2.21731
+	mean_observations_per_image = 614.75
+	mean_reprojection_error = 0.385994
+
+Registered: dioscuri / dioscuri -> 4 / 70
+
+
+***** lizard *****
+Reconstruction:
+	num_reg_images = 2
+	num_cameras = 2
+	num_points3D = 1167
+	num_observations = 2334
+	mean_track_length = 2
+	mean_observations_per_image = 1167
+	mean_reprojection_error = 0.583058
+
+Registered: lizard / lizard -> 2 / 110
+
+
+***** pond *****
+Reconstruction:
+	num_reg_images = 3
+	num_cameras = 3
+	num_points3D = 442
+	num_observations = 1211
+	mean_track_length = 2.73982
+	mean_observations_per_image = 403.667
+	mean_reprojection_error = 0.747478
+Reconstruction:
+	num_reg_images = 4
+	num_cameras = 4
+	num_points3D = 253
+	num_observations = 923
+	mean_track_length = 3.64822
+	mean_observations_per_image = 230.75
+	mean_reprojection_error = 1.05631
+
+Registered: pond / pond -> 4 / 110
+
+
+***** church *****
+Reconstruction:
+	num_reg_images = 71
+	num_cameras = 71
+	num_points3D = 12357
+	num_observations = 82696
+	mean_track_length = 6.69224
+	mean_observations_per_image = 1164.73
+	mean_reprojection_error = 0.992776
+Reconstruction:
+	num_reg_images = 11
+	num_cameras = 11
+	num_points3D = 4288
+	num_observations = 20862
+	mean_track_length = 4.86521
+	mean_observations_per_image = 1896.55
+	mean_reprojection_error = 0.843389
+
+Registered: church / church -> 71 / 110
+
+
+[church                           ] mAA:   7.4766%
+[dioscuri                         ] mAA:   0.4975%
+[lizard                           ] mAA:  10.5919%
+[pond                             ] mAA:   4.5171%
+
+[ Global mAA                      ] mAA:   5.7708%
+
+Elapsed time: 1018.27 seconds

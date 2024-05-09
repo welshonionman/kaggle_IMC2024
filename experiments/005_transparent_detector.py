@@ -6,6 +6,7 @@ import os
 import warnings
 from src.pipeline import run_from_config
 from src.utils.utils import cat2scenes
+from src.keypoint_viz import keypoint_viz
 
 warnings.filterwarnings("ignore")
 
@@ -46,10 +47,17 @@ class Config:
 
     # detect_keypoints function's arguments
     detector = ["ALIKED"]
+
     aliked_config = {
         "max_num_keypoints": 4096,
         "resize_to": 1024,
         "detection_threshold": 0.01,
+    }
+
+    aliked_config_transparent = {
+        "max_num_keypoints": 8192,
+        "resize_to": 1024,
+        "detection_threshold": 0.001,
     }
 
     # keypoint_distances function's arguments
@@ -65,9 +73,16 @@ class Config:
         "num_threads": 1,
     }
 
-    rotate: bool = False
+    rotate: bool = True
+    detector_transp: bool = True
+
+    keypoint_viz: bool = False
+    keypoint_viz_dir: Path = Path(f"/kaggle/eda/keypoint_viz/{exp_name}")
 
 
 if __name__ == "__main__":
-    shutil.rmtree(Config.feature_dir, ignore_errors=True)
-    run_from_config(config=Config)
+    if (Config.keypoint_viz) and (not Config.is_kaggle_notebook):
+        keypoint_viz(Config)
+    else:
+        shutil.rmtree(Config.feature_dir, ignore_errors=True)
+        run_from_config(config=Config)

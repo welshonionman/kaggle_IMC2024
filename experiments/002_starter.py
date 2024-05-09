@@ -6,6 +6,7 @@ import os
 import warnings
 from src.pipeline import run_from_config
 from src.utils.utils import cat2scenes
+from src.keypoint_viz import keypoint_viz
 
 warnings.filterwarnings("ignore")
 
@@ -15,7 +16,7 @@ class Config:
     is_kaggle_notebook: bool = any("KAGGLE" in item for item in dict(os.environ).keys())
     train_test = "test" if is_kaggle_notebook else "train"
 
-    valid_image_num: int = 3  # validationに使用する画像数（デバッグ用）
+    valid_image_num: int = 9999  # validationに使用する画像数（デバッグ用）
     log_path = Path(f"/kaggle/log/{exp_name}.log")
     gt_csv_path = Path("/kaggle/src/valid_gt.csv")
 
@@ -45,6 +46,8 @@ class Config:
     }
 
     # detect_keypoints function's arguments
+    detector = ["ALIKED"]
+    
     aliked_config = {
         "max_num_keypoints": 4096,
         "resize_to": 1280,
@@ -64,9 +67,16 @@ class Config:
         "num_threads": 1,
     }
 
-    rotate: bool = True
+    rotate: bool = False
+    detector_transp: bool = False
+
+    keypoint_viz: bool = False
+    keypoint_viz_dir: Path = Path(f"/kaggle/eda/keypoint_viz/{exp_name}")
 
 
 if __name__ == "__main__":
-    shutil.rmtree(Config.feature_dir, ignore_errors=True)
-    run_from_config(config=Config)
+    if (Config.keypoint_viz) and (not Config.is_kaggle_notebook):
+        keypoint_viz(Config)
+    else:
+        shutil.rmtree(Config.feature_dir, ignore_errors=True)
+        run_from_config(config=Config)

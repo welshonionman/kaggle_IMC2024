@@ -47,6 +47,7 @@ class Config:
 
     # detect_keypoints function's arguments
     detector = ["ALIKED"]
+    
     aliked_config = {
         "max_num_keypoints": 4096,
         "resize_to": 1024,
@@ -66,7 +67,8 @@ class Config:
         "num_threads": 1,
     }
 
-    rotate: bool = True
+    rotate: bool = False
+    detector_transp: bool = False
 
     keypoint_viz: bool = False
     keypoint_viz_dir: Path = Path(f"/kaggle/eda/keypoint_viz/{exp_name}")
