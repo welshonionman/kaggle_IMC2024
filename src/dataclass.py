@@ -4,7 +4,7 @@ import torch
 
 
 @dataclass
-class ALIKEDConfig:
+class LightGlueConfig:
     max_num_keypoints: int
     detection_threshold: float
     resize: int
@@ -34,8 +34,8 @@ class Config:
     pair_matching_args: dict
 
     detector: list[str]
-    aliked_config: ALIKEDConfig
-    aliked_config_transparent: ALIKEDConfig
+    aliked_config: LightGlueConfig
+    aliked_config_transparent: LightGlueConfig
     dedodev2_config: DeDoDev2Config
 
     matching_config: dict

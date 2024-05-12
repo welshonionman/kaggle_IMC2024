@@ -8,13 +8,13 @@ import numpy as np
 import gc
 import kornia.feature as KF
 from src.utils import load_torch_image
-from src.dataclass import Config, ALIKEDConfig  ###
+from src.dataclass import Config, LightGlueConfig
 from src.keypoint.rotate import apply_rotate
 
 
 def get_detector(
     model_name: str,
-    detector_config: ALIKEDConfig,  ###
+    detector_config: LightGlueConfig,
     device: torch.device,
 ) -> Extractor:
     dict_model = {
@@ -74,7 +74,7 @@ def detect_common(
             with torch.inference_mode():
                 image = load_torch_image(path, device=config.device).to(torch.float32)
 
-                detector = get_detector_by_scene(model_name, scene, config)  ###
+                detector = get_detector_by_scene(model_name, scene, config)
 
                 if is_rotate and ("air-to-ground" in config.cat2scenes_dict) and (scene in config.cat2scenes_dict["air-to-ground"]):
                     features = apply_rotate(path, image, detector, config)
