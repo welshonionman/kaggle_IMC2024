@@ -5,18 +5,16 @@ from concurrent.futures import ThreadPoolExecutor
 from concurrent import futures
 
 from src.pair_match import get_image_pairs
-from src.keypoint import detect_keypoints, match_keypoints
+from src.keypoint import detect_keypoints
 from src.dataclass import Config
 from src.utils.submission import parse_sample_submission, create_submission, parse_train_labels
 from src.utils import import_into_colmap, preparation
 from src.utils.evaluate import evaluate
 from src.reconstruction import find_optimal_reconstruction, parse_reconstructed_object
 from src.utils.utils import timer
+from src.keypoint.merge import keypoints_merger
 
 pycolmap.logging.minloglevel = 3
-
-
-
 
 
 def gpu_process(
@@ -27,10 +25,10 @@ def gpu_process(
     distances, index_pairs = get_image_pairs(path_dict, **config.pair_matching_args, device=config.device)
     gc.collect()
 
-    detect_keypoints(path_dict, scene, config)
+    files_matches = detect_keypoints(path_dict, index_pairs, scene, config)
     gc.collect()
 
-    match_keypoints(path_dict, index_pairs, config)
+    keypoints_merger(path_dict, index_pairs, files_matches)
     gc.collect()
     return
 

@@ -1,0 +1,1 @@
+from .lightglue_series import detect_lightglue_common
