@@ -16,6 +16,7 @@ kornia
 pycolmap
 git+https://github.com/cvg/LightGlue.git
 git+https://github.com/3DOM-FBK/deep-image-matching.git
+git+https://github.com/Parskatt/DKM
 ipykernel
 mediapy
 check_orientation
