@@ -47,7 +47,7 @@ class Config:
 
     # detect_keypoints function's arguments
     detector = ["DeDoDe"]
-    
+
     aliked_config = {
         "max_num_keypoints": 4096,
         "resize_to": 1024,
@@ -55,7 +55,7 @@ class Config:
     }
 
     # keypoint_distances function's arguments
-    keypoint_distances_args = {
+    matching_config = {
         "min_matches": 15,
         "verbose": False,
     }

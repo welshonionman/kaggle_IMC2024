@@ -52,7 +52,7 @@ def get_image_pairs(
     exhaustive_if_less: int = 20,
     p: float = 2.0,
     device: torch.device = torch.device("cpu"),
-) -> list[tuple[int, int]]:
+) -> tuple[torch.Tensor, list[tuple[int, int]]]:
     """類似した画像のペアを取得します"""
     image_paths = path_dict["image_paths"]
     # if len(image_paths) <= exhaustive_if_less:

@@ -88,7 +88,7 @@ def timer(func):
 
 
 def import_into_colmap(
-    path: Path,
+    images_dir: Path,
     feature_dir: Path,
     database_path: Path,
 ) -> None:
@@ -96,6 +96,6 @@ def import_into_colmap(
     db = COLMAPDatabase.connect(database_path)
     db.create_tables()
     single_camera = False
-    fname_to_id = add_keypoints(db, feature_dir, path, "", "simple-pinhole", single_camera)
+    fname_to_id = add_keypoints(db, feature_dir, images_dir, "", "simple-pinhole", single_camera)
     add_matches(db, feature_dir, fname_to_id)
     db.commit()

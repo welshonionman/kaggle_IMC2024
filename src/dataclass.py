@@ -38,7 +38,7 @@ class Config:
     aliked_config_transparent: ALIKEDConfig
     dedodev2_config: DeDoDev2Config
 
-    keypoint_distances_args: dict
+    matching_config: dict
 
     colmap_mapper_options: dict
 

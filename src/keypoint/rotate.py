@@ -54,12 +54,12 @@ def rotate_kpts(kpts, im_shape, k):
 def apply_rotate(
     path: Path,
     image: torch.Tensor,
-    extractor: torch.nn.Module,
+    detector: torch.nn.Module,
     config: Config,
 ):
     correct_rot = detect_rot(path)
     image = torch.rot90(image, correct_rot, dims=(2, 3))
-    features = extractor(image)
+    features = detector(image)
     tmp_np = features["keypoints"][0].cpu().numpy()
     rot_kpts = rotate_kpts(tmp_np, (image.shape[3], image.shape[2]), correct_rot)
     keypoints_rot = torch.from_numpy(rot_kpts).unsqueeze(0).to(config.device)

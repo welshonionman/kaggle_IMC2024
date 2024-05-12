@@ -61,7 +61,7 @@ class Config:
     }
 
     # keypoint_distances function's arguments
-    keypoint_distances_args = {
+    matching_config = {
         "min_matches": 15,
         "verbose": False,
     }

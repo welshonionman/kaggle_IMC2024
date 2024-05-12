@@ -19,8 +19,8 @@ def match_keypoints(
 ) -> None:
     image_paths = path_dict["image_paths"]
     feature_dir = path_dict["feature_dir"]
-    min_matches = config.keypoint_distances_args["min_matches"]
-    verbose = config.keypoint_distances_args["verbose"]
+    min_matches = config.matching_config["min_matches"]
+    verbose = config.matching_config["verbose"]
 
     matcher_params = {
         "width_confidence": -1,
@@ -28,7 +28,14 @@ def match_keypoints(
         "mp": True if "cuda" in str(config.device) else False,
     }
     model = model_dict[config.detector[0]]
-    matcher = KF.LightGlueMatcher(model, matcher_params).eval().to(config.device)
+    matcher = (
+        KF.LightGlueMatcher(
+            model,
+            matcher_params,
+        )
+        .eval()
+        .to(config.device)
+    )
 
     with (
         h5py.File(feature_dir / "keypoints.h5", mode="r") as f_keypoints,
