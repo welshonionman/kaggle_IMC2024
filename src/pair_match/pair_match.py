@@ -24,7 +24,7 @@ def embed_images(
     embeddings = []
 
     for i, path in enumerate(tqdm(image_paths, desc="Global descriptors")):
-        image = load_torch_image(path)
+        image = load_torch_image(path, device=device)
 
         with torch.inference_mode():
             inputs = processor(images=image, return_tensors="pt", do_rescale=False).to(device)

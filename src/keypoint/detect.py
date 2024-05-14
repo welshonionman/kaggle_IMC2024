@@ -1,7 +1,6 @@
 from pathlib import Path
 from src.dataclass import Config
-from src.keypoint.detector import detect_lightglue_common
-from src.keypoint.detector.loftr import detect_loftr
+from src.keypoint.detector import detect_lightglue_common, detect_kornia_common, detect_loftr
 
 
 def detect_keypoints(
@@ -13,27 +12,36 @@ def detect_keypoints(
     detected = False
 
     files_matches = []
+    detectors = [detector.lower() for detector in config.detector]
 
-    if "ALIKED" in config.detector:
+    if "aliked" in detectors:
         model_name = "aliked"
-        detect_lightglue_common(
-            model_name,
-            path_dict,
-            index_pairs,
-            scene,
-            config,
-        )
+        detect_lightglue_common(model_name, path_dict, index_pairs, scene, config)
         files_matches.append(f"{path_dict['feature_dir']}/matches_{model_name}.h5")
         detected = True
 
-    if "LoFTR" in config.detector:
-        detect_loftr(
-            path_dict,
-            index_pairs,
-            scene,
-            config,
-        )
-        files_matches.append(f"{path_dict['feature_dir']}/matches_LoFTR.h5")
+    if "dedode" in detectors:
+        model_name = "dedodeg"
+        detect_kornia_common(model_name, path_dict, index_pairs, scene, config)
+        files_matches.append(f"{path_dict['feature_dir']}/matches_{model_name}.h5")
+        detected = True
+
+    if "disk" in detectors:
+        model_name = "disk"
+        detect_kornia_common(model_name, path_dict, index_pairs, scene, config)
+        files_matches.append(f"{path_dict['feature_dir']}/matches_{model_name}.h5")
+        detected = True
+
+    if "sift" in detectors:
+        model_name = "sift"
+        detect_kornia_common(model_name, path_dict, index_pairs, scene, config)
+        files_matches.append(f"{path_dict['feature_dir']}/matches_{model_name}.h5")
+        detected = True
+
+    if "loftr" in detectors:
+        model_name = "loftr"
+        detect_loftr(path_dict, index_pairs, scene, config)
+        files_matches.append(f"{path_dict['feature_dir']}/matches_{model_name}.h5")
         detected = True
 
     if not detected:

@@ -77,7 +77,7 @@ def detect_common(
                 detector = get_detector_by_scene(model_name, scene, config)
 
                 if is_rotate and ("air-to-ground" in config.cat2scenes_dict) and (scene in config.cat2scenes_dict["air-to-ground"]):
-                    features = apply_rotate(path, image, detector, config)
+                    features = apply_rotate(model_name, path, image, detector, config)
                 else:
                     features = detector(image)
 
@@ -87,6 +87,26 @@ def detect_common(
                 f_descriptors[key] = descs
 
 
+def get_matcher(
+    model_name: str,
+    config: Config,
+) -> KF.LightGlueMatcher:
+    matcher = (
+        KF.LightGlueMatcher(
+            model_name,
+            {
+                "width_confidence": -1,
+                "depth_confidence": -1,
+                "mp": True if "cuda" in str(config.device) else False,
+            },
+        )
+        .eval()
+        .to(config.device)
+    )
+
+    return matcher
+
+
 def match_with_lightglue_common(
     model_name,
     image_paths,
@@ -94,20 +114,7 @@ def match_with_lightglue_common(
     feature_dir,
     config: Config,
 ):
-    matcher_params = {
-        "width_confidence": -1,
-        "depth_confidence": -1,
-        "mp": True if "cuda" in str(config.device) else False,
-    }
-
-    matcher = (
-        KF.LightGlueMatcher(
-            model_name,
-            matcher_params,
-        )
-        .eval()
-        .to(config.device)
-    )
+    matcher = get_matcher(model_name, config)
 
     cnt_pairs = 0
 

@@ -17,9 +17,13 @@ def arr_to_str(a):
     return ";".join([str(x) for x in a.reshape(-1)])
 
 
-def load_torch_image(file_name: Path | str, device=torch.device("cpu")):
-    """Loads an image and adds batch dimension"""
-    img = K.io.load_image(file_name, K.io.ImageLoadType.RGB32, device=device)[None, ...]
+def load_torch_image(file_name: Path | str, load_type="RGB32", device=torch.device("cpu")):
+    if load_type == "RGB32":
+        img = K.io.load_image(file_name, K.io.ImageLoadType.RGB32, device=device)[None, ...]
+    elif load_type == "GRAY32":
+        img = K.io.load_image(file_name, K.io.ImageLoadType.GRAY32, device=device)[None, ...]
+    else:
+        raise ValueError(f"Unknown load type: {load_type}")
     return img
 
 
