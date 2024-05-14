@@ -74,7 +74,7 @@ class LoFTRDataset(Dataset):
         return image1, image2, key1, key2, idx1, idx2, ori_shape_1, ori_shape_2
 
 
-def detect_loftr(
+def feature_loftr(
     path_dict: dict,
     index_pairs: list[tuple[int, int]],
     scene: str,

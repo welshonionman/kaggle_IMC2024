@@ -110,7 +110,7 @@ def detect_common(
                     descriptions = outputs[0].descriptors
                 elif model_name == "sift":
                     keypoints = outputs[0][..., 2]
-                    responses = outputs[1]
+                    responses = outputs[1]  # noqa
                     descriptions = outputs[2]
 
                 kpts = keypoints.squeeze().detach().cpu().numpy()
@@ -190,7 +190,7 @@ def match_with_kornia_common(
                     print(f"{key1}-{key2}: {n_matches} matches --> skipped")
 
 
-def detect_kornia_common(
+def feature_kornia_common(
     model_name: str,
     path_dict: dict[str, Path | list[Path]],
     index_pairs: list[tuple[int, int]],
@@ -219,5 +219,3 @@ def detect_kornia_common(
     gc.collect()
 
     print(f"Features matched ({model_name}+kornia)")
-
-    KF.LightGlue

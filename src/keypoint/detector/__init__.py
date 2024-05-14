@@ -1,3 +1,3 @@
-from .lightglue_series import detect_lightglue_common
-from .kornia_series import detect_kornia_common
-from .loftr import detect_loftr
+from .lightglue_series import feature_lightglue_common
+from .kornia_series import feature_kornia_common
+from .loftr import feature_loftr

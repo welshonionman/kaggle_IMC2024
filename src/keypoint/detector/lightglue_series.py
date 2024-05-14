@@ -157,7 +157,7 @@ def match_with_lightglue_common(
                     print(f"{key1}-{key2}: {n_matches} matches --> skipped")
 
 
-def detect_lightglue_common(
+def feature_lightglue_common(
     model_name: str,
     path_dict: dict[str, Path | list[Path]],
     index_pairs: list[tuple[int, int]],
