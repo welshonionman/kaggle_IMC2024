@@ -8,7 +8,9 @@ from torch.utils.data import Dataset
 import kornia as K
 from kornia.feature import LoFTR
 import h5py
+from check_orientation.pre_trained_models import create_model
 from src.dataclass import Config
+from src.keypoint.rotate import detect_rot
 
 
 class LoFTRDataset(Dataset):
@@ -19,7 +21,7 @@ class LoFTRDataset(Dataset):
         idxs1: list[int],
         idxs2: list[int],
         resize_small_edge_to: int,
-        device: torch.device,
+        config: Config,
     ):
         self.fnames1 = fnames1
         self.fnames2 = fnames2
@@ -28,7 +30,7 @@ class LoFTRDataset(Dataset):
         self.idxs1 = idxs1
         self.idxs2 = idxs2
         self.resize_small_edge_to = resize_small_edge_to
-        self.device = device
+        self.config = config
         self.round_unit = 16
 
     def __len__(self):
@@ -37,7 +39,6 @@ class LoFTRDataset(Dataset):
     def load_torch_image(
         self,
         fname: Path,
-        device: torch.device,
     ) -> tuple[torch.Tensor, tuple[int, int, int]]:
         img = cv2.imread(str(fname))
         original_shape = img.shape
@@ -48,7 +49,7 @@ class LoFTRDataset(Dataset):
         img_resized = K.image_to_tensor(img_resized, False).float() / 255.0
         img_resized = K.color.bgr_to_rgb(img_resized)
         img_resized = K.color.rgb_to_grayscale(img_resized)
-        return img_resized.to(device), original_shape
+        return img_resized.to(self.config.device), original_shape
 
     def __getitem__(
         self, idx: int
@@ -68,10 +69,33 @@ class LoFTRDataset(Dataset):
         idx2 = self.idxs2[idx]
         fname1 = self.fnames1[idx]
         fname2 = self.fnames2[idx]
-        image1, ori_shape_1 = self.load_torch_image(fname1, self.device)
-        image2, ori_shape_2 = self.load_torch_image(fname2, self.device)
+        image1, ori_shape_1 = self.load_torch_image(fname1)
+        image2, ori_shape_2 = self.load_torch_image(fname2)
 
         return image1, image2, key1, key2, idx1, idx2, ori_shape_1, ori_shape_2
+
+
+def rotate_images(image_paths: list[Path], config: Config) -> dict:
+    rot_dict = {}
+    check_orientation_model = create_model("swsl_resnext50_32x4d").to(config.device).eval()
+
+    for image_path in tqdm(image_paths, desc="Detecting orientation"):
+        rot_dict[image_path] = detect_rot(image_path)
+
+    del check_orientation_model
+    torch.cuda.empty_cache()
+    return rot_dict
+
+
+def adjust_keypoints_scale(image, ori_shape, mkpts, rot):
+    if rot in [0, 2]:
+        mkpts[:, 0] *= float(ori_shape[1]) / float(image.shape[3])
+        mkpts[:, 1] *= float(ori_shape[0]) / float(image.shape[2])
+    else:
+        mkpts[:, 0] *= float(ori_shape[0]) / float(image.shape[3])
+        mkpts[:, 1] *= float(ori_shape[1]) / float(image.shape[2])
+
+    return mkpts
 
 
 def feature_loftr(
@@ -105,32 +129,45 @@ def feature_loftr(
         idxs1,
         idxs2,
         resize_small_edge_to,
-        config.device,
+        config,
     )
 
     cnt_pairs = 0
+
+    is_rotate = (
+        getattr(config, "rotate", False) and ("air-to-ground" in config.cat2scenes_dict) and (scene in config.cat2scenes_dict["air-to-ground"])
+    )
+
+    with torch.inference_mode():
+        if is_rotate:
+            rot_dict = rotate_images(image_paths, config)
 
     with h5py.File(f"{feature_dir}/matches_loftr.h5", mode="w") as f_match:
         for data in tqdm(dataset, desc="Matching keypoints / LoFTR"):
             image1, image2, key1, key2, idx1, idx2, ori_shape_1, ori_shape_2 = data
             fname1, fname2 = image_paths[idx1], image_paths[idx2]
+            rot1, rot2 = 0, 0
 
-            with torch.no_grad():
+            with torch.inference_mode():
+                if is_rotate:
+                    rot1 = rot_dict[image_paths[idx1]]
+                    rot2 = rot_dict[image_paths[idx2]]
+                    image1 = torch.rot90(torch.tensor(image1), rot1, [2, 3])
+                    image2 = torch.rot90(torch.tensor(image2), rot2, [2, 3])
+
                 correspondences = matcher(
                     {
                         "image0": image1.to(config.device),
                         "image1": image2.to(config.device),
                     }
                 )
+
                 mkpts1 = correspondences["keypoints0"].cpu().numpy()  # shape: (n, 2)
                 mkpts2 = correspondences["keypoints1"].cpu().numpy()  # shape: (n, 2)
                 mconf = correspondences["confidence"].cpu().numpy()  # shape: (n,)
 
-            mkpts1[:, 0] *= float(ori_shape_1[1]) / float(image1.shape[3])
-            mkpts1[:, 1] *= float(ori_shape_1[0]) / float(image1.shape[2])
-
-            mkpts2[:, 0] *= float(ori_shape_2[1]) / float(image2.shape[3])
-            mkpts2[:, 1] *= float(ori_shape_2[0]) / float(image2.shape[2])
+            mkpts1 = adjust_keypoints_scale(image1, ori_shape_1, mkpts1, rot1)
+            mkpts2 = adjust_keypoints_scale(image2, ori_shape_2, mkpts2, rot2)
 
             n_matches = mconf.shape[0]
 
@@ -143,4 +180,6 @@ def feature_loftr(
             else:
                 if config.matching_config["verbose"]:
                     print(f"{key1}-{key2}: {n_matches} matches --> skipped")
+    del dataset
+    torch.cuda.empty_cache()
     gc.collect()

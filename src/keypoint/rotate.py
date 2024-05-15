@@ -27,8 +27,8 @@ def detect_rot(img_path: Path):
 
     correct_rot = np.argmax(pred.detach().cpu().numpy())
     mapping = {0: 0, 1: 3, 2: 2, 3: 1}  # rot90のパラメータとの対応
-
-    return mapping[correct_rot]
+    rot_value = mapping[correct_rot]
+    return rot_value
 
 
 def rotate_kpts(kpts, im_shape, k):
