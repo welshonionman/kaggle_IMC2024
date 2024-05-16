@@ -4,6 +4,7 @@ __pycache__/
 *.DS_Store
 *.swp
 *.pth
+*.ckpt
 tmp.*
 */.ipynb_checkpoints/*
 
