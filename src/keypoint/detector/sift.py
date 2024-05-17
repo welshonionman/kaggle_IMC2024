@@ -1,7 +1,6 @@
 from tqdm import tqdm
 from pathlib import Path
 import torch
-import cv2
 import h5py
 import numpy as np
 import gc
@@ -17,28 +16,8 @@ def get_detector(
     detector_config: dict,
     device: torch.device,
 ) -> KF.DeDoDe:
-    if model_name == "dedodeg":
-        detector = (
-            KF.DeDoDe()
-            .from_pretrained(
-                detector_weights="L-upright",
-                descriptor_weights="G-upright",
-            )
-            .eval()
-            .to(device, torch.float32)
-        )
 
-    if model_name == "sift":
-        detector = KF.SIFTFeature(upright=True).to(device)
-
-    if model_name == "disk":
-        detector = (
-            KF.DISK()
-            .from_pretrained(
-                "depth",
-            )
-            .to(device, torch.float32)
-        )
+    detector = KF.SIFTFeature(upright=True).to(device)
 
     return detector
 
@@ -72,27 +51,11 @@ def pad_to_multiple_of_16(tensor):
 
 
 def load_resize_image(model_name: str, path: Path, resize_to: int, config: Config):
-    if model_name == "sift":
-        image = load_torch_image(path, load_type="GRAY32", device=config.device).to(torch.float32)
-        original_shape = image.shape  # shape=(B, C, H, W)
-        ratio = resize_to / min([image.shape[2], image.shape[3]])
-        h, w = int(image.shape[2] * ratio), int(image.shape[3] * ratio)
-        image = F.interpolate(image, size=(h, w), mode="bilinear", align_corners=False)
-
-    if model_name == "dedodeg":
-        image = load_torch_image(path, load_type="RGB32", device=config.device).to(torch.float32)
-        original_shape = image.shape  # shape=(B, C, H, W)
-        ratio = resize_to / min([image.shape[2], image.shape[3]])
-        h, w = int(image.shape[2] * ratio), int(image.shape[3] * ratio)
-        image = F.interpolate(image, size=(h, w), mode="bilinear", align_corners=False)
-
-    if model_name == "disk":
-        image = load_torch_image(path, load_type="RGB32", device=config.device).to(torch.float32)
-        original_shape = image.shape  # shape=(B, C, H, W)
-        ratio = resize_to / max([image.shape[2], image.shape[3]])
-        h, w = int(image.shape[2] * ratio), int(image.shape[3] * ratio)
-        image = F.interpolate(image, size=(h, w), mode="bilinear", align_corners=False)
-        image = pad_to_multiple_of_16(image)
+    image = load_torch_image(path, load_type="GRAY32", device=config.device).to(torch.float32)
+    original_shape = image.shape  # shape=(B, C, H, W)
+    ratio = resize_to / min([image.shape[2], image.shape[3]])
+    h, w = int(image.shape[2] * ratio), int(image.shape[3] * ratio)
+    image = F.interpolate(image, size=(h, w), mode="bilinear", align_corners=False)
 
     return image, original_shape
 
@@ -135,16 +98,9 @@ def detect_common(
                 else:
                     outputs = detector(image)
 
-                if model_name == "dedodeg":
-                    keypoints, scores, descriptions = outputs
-                elif model_name == "disk":
-                    keypoints = outputs[0].keypoints
-                    scores = outputs[0].detection_scores
-                    descriptions = outputs[0].descriptors
-                elif model_name == "sift":
-                    keypoints = outputs[0][..., 2][0]
-                    scores = outputs[1][0]  # noqa
-                    descriptions = outputs[2][0]
+                keypoints = outputs[0][..., 2][0]
+                scores = outputs[1][0]  # noqa
+                descriptions = outputs[2][0]
 
                 keypoints = adjust_keypoints_scale(image, ori_shape, keypoints, rot)
                 kpts = keypoints.squeeze().detach().cpu().numpy()
@@ -224,7 +180,7 @@ def match_with_kornia_common(
                     print(f"{key1}-{key2}: {n_matches} matches --> skipped")
 
 
-def feature_kornia_common(
+def feature_sift(
     model_name: str,
     path_dict: dict[str, Path | list[Path]],
     index_pairs: list[tuple[int, int]],

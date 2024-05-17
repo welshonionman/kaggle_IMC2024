@@ -1,12 +1,14 @@
 from pathlib import Path
 from src.dataclass import Config
 from src.keypoint.detector import (
-    feature_kornia_common,
     feature_loftr,
     feature_eloftr,
     feature_aliked,
     feature_superpoint,
     feature_doghardnet,
+    feature_dedode,
+    feature_disk,
+    feature_sift,
 )
 
 
@@ -41,19 +43,19 @@ def detect_keypoints(
 
     if "dedode" in detectors:
         model_name = "dedodeg"
-        feature_kornia_common(model_name, path_dict, index_pairs, scene, config)
+        feature_dedode(model_name, path_dict, index_pairs, scene, config)
         files_matches.append(f"{path_dict['feature_dir']}/matches_{model_name}.h5")
         detected = True
 
     if "disk" in detectors:
         model_name = "disk"
-        feature_kornia_common(model_name, path_dict, index_pairs, scene, config)
+        feature_disk(model_name, path_dict, index_pairs, scene, config)
         files_matches.append(f"{path_dict['feature_dir']}/matches_{model_name}.h5")
         detected = True
 
     if "sift" in detectors:
         model_name = "sift"
-        feature_kornia_common(model_name, path_dict, index_pairs, scene, config)
+        feature_sift(model_name, path_dict, index_pairs, scene, config)
         files_matches.append(f"{path_dict['feature_dir']}/matches_{model_name}.h5")
         detected = True
 
@@ -62,6 +64,7 @@ def detect_keypoints(
         feature_loftr(path_dict, index_pairs, scene, config)
         files_matches.append(f"{path_dict['feature_dir']}/matches_{model_name}.h5")
         detected = True
+
     if "eloftr" in detectors:
         model_name = "eloftr"
         feature_eloftr(path_dict, index_pairs, scene, config)
