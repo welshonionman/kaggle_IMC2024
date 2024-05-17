@@ -27,6 +27,7 @@ def get_detector(
 
     detector = (
         extractor_class(
+            model_name=detector_config["model_name"],
             max_num_keypoints=detector_config["max_num_keypoints"],
             detection_threshold=detector_config["detection_threshold"],
             resize=detector_config["resize_to"],
