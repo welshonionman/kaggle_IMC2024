@@ -14,8 +14,24 @@ Registered: transp_obj_glass_cup / transp_obj_glass_cup -> 0 / 36
 
 
 ***** transp_obj_glass_cylinder *****
+Reconstruction:
+	num_reg_images = 5
+	num_cameras = 5
+	num_points3D = 197
+	num_observations = 405
+	mean_track_length = 2.05584
+	mean_observations_per_image = 81
+	mean_reprojection_error = 0.762078
+Reconstruction:
+	num_reg_images = 3
+	num_cameras = 3
+	num_points3D = 30
+	num_observations = 65
+	mean_track_length = 2.16667
+	mean_observations_per_image = 21.6667
+	mean_reprojection_error = 0.402515
 
-Registered: transp_obj_glass_cylinder / transp_obj_glass_cylinder -> 0 / 36
+Registered: transp_obj_glass_cylinder / transp_obj_glass_cylinder -> 5 / 36
 
 
 ***** multi-temporal-temple-baalshamin *****
@@ -113,8 +129,8 @@ Registered: church / church -> 109 / 110
 [multi-temporal-temple-baalshamin ] mAA:  24.3386%
 [pond                             ] mAA:  27.7259%
 [transp_obj_glass_cup             ] mAA:   0.0000%
-[transp_obj_glass_cylinder        ] mAA:   0.0000%
+[transp_obj_glass_cylinder        ] mAA:   2.0202%
 
-[ Global mAA                      ] mAA:  20.1313%
+[ Global mAA                      ] mAA:  20.4199%
 
-Elapsed time: 9067.16 seconds
+Elapsed time: 9376.05 seconds

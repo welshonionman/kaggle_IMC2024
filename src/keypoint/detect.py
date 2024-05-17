@@ -1,6 +1,6 @@
 from pathlib import Path
 from src.dataclass import Config
-from src.keypoint.detector import feature_lightglue_common, feature_kornia_common, feature_loftr
+from src.keypoint.detector import feature_lightglue_common, feature_kornia_common, feature_loftr, feature_eloftr
 
 
 def detect_keypoints(
@@ -41,6 +41,11 @@ def detect_keypoints(
     if "loftr" in detectors:
         model_name = "loftr"
         feature_loftr(path_dict, index_pairs, scene, config)
+        files_matches.append(f"{path_dict['feature_dir']}/matches_{model_name}.h5")
+        detected = True
+    if "eloftr" in detectors:
+        model_name = "eloftr"
+        feature_eloftr(path_dict, index_pairs, scene, config)
         files_matches.append(f"{path_dict['feature_dir']}/matches_{model_name}.h5")
         detected = True
 

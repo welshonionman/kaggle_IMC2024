@@ -8,44 +8,75 @@ transp_obj_glass_cup / transp_obj_glass_cup -> 36 images
 transp_obj_glass_cylinder / transp_obj_glass_cylinder -> 36 images
 
 
+***** transp_obj_glass_cup *****
+Reconstruction:
+	num_reg_images = 6
+	num_cameras = 6
+	num_points3D = 0
+	num_observations = 0
+	mean_track_length = 0
+	mean_observations_per_image = 0
+	mean_reprojection_error = 0
+
+Registered: transp_obj_glass_cup / transp_obj_glass_cup -> 6 / 36
+
+
+***** transp_obj_glass_cylinder *****
+
+Registered: transp_obj_glass_cylinder / transp_obj_glass_cylinder -> 0 / 36
+
+
+***** multi-temporal-temple-baalshamin *****
+Reconstruction:
+	num_reg_images = 66
+	num_cameras = 66
+	num_points3D = 42829
+	num_observations = 227179
+	mean_track_length = 5.30433
+	mean_observations_per_image = 3442.11
+	mean_reprojection_error = 1.33669
+
+Registered: multi-temporal-temple-baalshamin / multi-temporal-temple-baalshamin -> 66 / 66
+
+
 ***** dioscuri *****
 Reconstruction:
-	num_reg_images = 53
-	num_cameras = 53
-	num_points3D = 36250
-	num_observations = 166487
-	mean_track_length = 4.59274
-	mean_observations_per_image = 3141.26
-	mean_reprojection_error = 0.875209
+	num_reg_images = 52
+	num_cameras = 52
+	num_points3D = 36268
+	num_observations = 166465
+	mean_track_length = 4.58986
+	mean_observations_per_image = 3201.25
+	mean_reprojection_error = 0.876077
 Reconstruction:
 	num_reg_images = 9
 	num_cameras = 9
-	num_points3D = 6314
-	num_observations = 20310
-	mean_track_length = 3.21666
-	mean_observations_per_image = 2256.67
-	mean_reprojection_error = 1.04191
+	num_points3D = 6173
+	num_observations = 20049
+	mean_track_length = 3.24785
+	mean_observations_per_image = 2227.67
+	mean_reprojection_error = 1.04921
 
-Registered: dioscuri / dioscuri -> 53 / 70
+Registered: dioscuri / dioscuri -> 52 / 70
 
 
 ***** lizard *****
 Reconstruction:
 	num_reg_images = 83
 	num_cameras = 83
-	num_points3D = 58866
-	num_observations = 249015
-	mean_track_length = 4.2302
-	mean_observations_per_image = 3000.18
-	mean_reprojection_error = 1.00216
+	num_points3D = 58835
+	num_observations = 249187
+	mean_track_length = 4.23535
+	mean_observations_per_image = 3002.25
+	mean_reprojection_error = 1.02187
 Reconstruction:
-	num_reg_images = 7
-	num_cameras = 7
-	num_points3D = 2623
-	num_observations = 8011
-	mean_track_length = 3.05414
-	mean_observations_per_image = 1144.43
-	mean_reprojection_error = 0.719269
+	num_reg_images = 4
+	num_cameras = 4
+	num_points3D = 5
+	num_observations = 16
+	mean_track_length = 3.2
+	mean_observations_per_image = 4
+	mean_reprojection_error = 0.195365
 
 Registered: lizard / lizard -> 83 / 110
 
@@ -54,19 +85,19 @@ Registered: lizard / lizard -> 83 / 110
 Reconstruction:
 	num_reg_images = 3
 	num_cameras = 3
-	num_points3D = 7
-	num_observations = 17
-	mean_track_length = 2.42857
-	mean_observations_per_image = 5.66667
-	mean_reprojection_error = 0.0298627
+	num_points3D = 9
+	num_observations = 22
+	mean_track_length = 2.44444
+	mean_observations_per_image = 7.33333
+	mean_reprojection_error = 0.129254
 Reconstruction:
 	num_reg_images = 52
 	num_cameras = 52
-	num_points3D = 32760
-	num_observations = 133090
-	mean_track_length = 4.06258
-	mean_observations_per_image = 2559.42
-	mean_reprojection_error = 0.923181
+	num_points3D = 32610
+	num_observations = 131842
+	mean_track_length = 4.04299
+	mean_observations_per_image = 2535.42
+	mean_reprojection_error = 0.96874
 
 Registered: pond / pond -> 52 / 110
 
@@ -85,10 +116,13 @@ Registered: church / church -> 107 / 110
 
 
 [church                           ] mAA:  32.2430%
-[dioscuri                         ] mAA:  38.3085%
-[lizard                           ] mAA:  63.0841%
-[pond                             ] mAA:  35.5140%
+[dioscuri                         ] mAA:  39.3035%
+[lizard                           ] mAA:  59.0343%
+[multi-temporal-temple-baalshamin ] mAA:  23.2804%
+[pond                             ] mAA:  33.0218%
+[transp_obj_glass_cup             ] mAA:   2.0202%
+[transp_obj_glass_cylinder        ] mAA:   0.0000%
 
-[ Global mAA                      ] mAA:  42.2874%
+[ Global mAA                      ] mAA:  26.9862%
 
-Elapsed time: 1521.81 seconds
+Elapsed time: 2305.23 seconds

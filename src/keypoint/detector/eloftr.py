@@ -22,6 +22,7 @@ class LoFTRDataset(Dataset):
         idxs1: list[int],
         idxs2: list[int],
         resize_small_edge_to: int,
+        scene: str,
         config: Config,
     ):
         self.fnames1 = fnames1
@@ -31,17 +32,46 @@ class LoFTRDataset(Dataset):
         self.idxs1 = idxs1
         self.idxs2 = idxs2
         self.resize_small_edge_to = resize_small_edge_to
+        self.scene = scene
         self.config = config
         self.round_unit = 16
 
     def __len__(self):
         return len(self.fnames1)
 
+    def fill_holes(self, image, fill_value=1):
+        """
+        二値画像中の一定の面積より小さい穴を埋める
+        """
+        if image.sum() == 0:
+            return image
+        result_image = image.copy()
+        contours, hierarchies = cv2.findContours(result_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+        for contour, hierarchy in zip(contours, hierarchies[0]):
+            cv2.drawContours(result_image, [contour], -1, fill_value, thickness=cv2.FILLED)
+        return result_image
+
+    def masked_image(self, path):
+        img = cv2.imread(str(path))
+        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        img_gray = cv2.GaussianBlur(img_gray, (5, 5), 5)
+        _, img_thre = cv2.threshold(img_gray, 0, 255, cv2.THRESH_OTSU)
+        img_thre = img_thre // 255
+        img_thre = cv2.dilate(img_thre, np.ones((5, 5)), iterations=30)
+        img_thre = self.fill_holes(img_thre, 1)
+        masked_img = img * img_thre[:, :, np.newaxis]
+        return masked_img
+
     def load_torch_image(
         self,
         fname: Path,
     ) -> tuple[torch.Tensor, tuple[int, int, int]]:
-        img = cv2.imread(str(fname))
+        if ("transparent" in self.config.cat2scenes_dict) and (self.scene in self.config.cat2scenes_dict["transparent"]):
+            img = self.masked_image(str(fname))
+        else:
+            img = cv2.imread(str(fname))
         original_shape = img.shape
         ratio = self.resize_small_edge_to / min([img.shape[0], img.shape[1]])
         w = int(img.shape[1] * ratio)  # int( (img.shape[1] * ratio) // self.round_unit * self.round_unit )
@@ -137,6 +167,7 @@ def feature_eloftr(
         idxs1,
         idxs2,
         resize_small_edge_to,
+        scene,
         config,
     )
 

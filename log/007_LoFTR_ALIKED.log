@@ -10,28 +10,28 @@ transp_obj_glass_cylinder / transp_obj_glass_cylinder -> 36 images
 
 ***** transp_obj_glass_cup *****
 Reconstruction:
-	num_reg_images = 4
-	num_cameras = 4
-	num_points3D = 6945
-	num_observations = 15783
-	mean_track_length = 2.27257
-	mean_observations_per_image = 3945.75
-	mean_reprojection_error = 1.1392
-Reconstruction:
-	num_reg_images = 3
-	num_cameras = 3
-	num_points3D = 0
-	num_observations = 0
-	mean_track_length = 0
-	mean_observations_per_image = 0
-	mean_reprojection_error = 0
+	num_reg_images = 9
+	num_cameras = 9
+	num_points3D = 7297
+	num_observations = 20443
+	mean_track_length = 2.80156
+	mean_observations_per_image = 2271.44
+	mean_reprojection_error = 1.22218
 
-Registered: transp_obj_glass_cup / transp_obj_glass_cup -> 4 / 36
+Registered: transp_obj_glass_cup / transp_obj_glass_cup -> 9 / 36
 
 
 ***** transp_obj_glass_cylinder *****
+Reconstruction:
+	num_reg_images = 11
+	num_cameras = 11
+	num_points3D = 2
+	num_observations = 7
+	mean_track_length = 3.5
+	mean_observations_per_image = 0.636364
+	mean_reprojection_error = 1.14236e-06
 
-Registered: transp_obj_glass_cylinder / transp_obj_glass_cylinder -> 0 / 36
+Registered: transp_obj_glass_cylinder / transp_obj_glass_cylinder -> 11 / 36
 
 
 ***** multi-temporal-temple-baalshamin *****
@@ -128,9 +128,9 @@ Registered: church / church -> 110 / 110
 [lizard                           ] mAA:  79.7508%
 [multi-temporal-temple-baalshamin ] mAA:  23.5450%
 [pond                             ] mAA:  51.7134%
-[transp_obj_glass_cup             ] mAA:   1.5152%
-[transp_obj_glass_cylinder        ] mAA:   0.0000%
+[transp_obj_glass_cup             ] mAA:   2.0202%
+[transp_obj_glass_cylinder        ] mAA:   2.5253%
 
-[ Global mAA                      ] mAA:  28.3371%
+[ Global mAA                      ] mAA:  28.7700%
 
-Elapsed time: 9510.55 seconds
+Elapsed time: 9979.02 seconds

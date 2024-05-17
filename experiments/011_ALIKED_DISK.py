@@ -46,7 +46,7 @@ class Config:
     }
 
     # detect_keypoints function's arguments
-    detector = ["disk"]
+    detector = ["disk", "aliked"]
 
     aliked_config = {
         "max_num_keypoints": 4096,

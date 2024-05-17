@@ -1,6 +1,7 @@
 from tqdm import tqdm
 from pathlib import Path
 import torch
+import cv2
 import h5py
 import numpy as np
 import gc
@@ -70,6 +71,43 @@ def pad_to_multiple_of_16(tensor):
     return padded_tensor
 
 
+def load_resize_image(model_name: str, path: Path, resize_to: int, config: Config):
+    if model_name == "sift":
+        image = load_torch_image(path, load_type="GRAY32", device=config.device).to(torch.float32)
+        original_shape = image.shape  # shape=(B, C, H, W)
+        ratio = resize_to / min([image.shape[2], image.shape[3]])
+        h, w = int(image.shape[2] * ratio), int(image.shape[3] * ratio)
+        image = F.interpolate(image, size=(h, w), mode="bilinear", align_corners=False)
+
+    if model_name == "dedodeg":
+        image = load_torch_image(path, load_type="RGB32", device=config.device).to(torch.float32)
+        original_shape = image.shape  # shape=(B, C, H, W)
+        ratio = resize_to / min([image.shape[2], image.shape[3]])
+        h, w = int(image.shape[2] * ratio), int(image.shape[3] * ratio)
+        image = F.interpolate(image, size=(h, w), mode="bilinear", align_corners=False)
+
+    if model_name == "disk":
+        image = load_torch_image(path, load_type="RGB32", device=config.device).to(torch.float32)
+        original_shape = image.shape  # shape=(B, C, H, W)
+        ratio = resize_to / max([image.shape[2], image.shape[3]])
+        h, w = int(image.shape[2] * ratio), int(image.shape[3] * ratio)
+        image = F.interpolate(image, size=(h, w), mode="bilinear", align_corners=False)
+        image = pad_to_multiple_of_16(image)
+
+    return image, original_shape
+
+
+def adjust_keypoints_scale(image, ori_shape, mkpts, rot):
+    if rot in [0, 2]:
+        mkpts[:, 0] *= float(ori_shape[3]) / float(image.shape[3])
+        mkpts[:, 1] *= float(ori_shape[2]) / float(image.shape[2])
+    else:
+        mkpts[:, 0] *= float(ori_shape[2]) / float(image.shape[3])
+        mkpts[:, 1] *= float(ori_shape[3]) / float(image.shape[2])
+
+    return mkpts
+
+
 def detect_common(
     model_name: str,
     image_paths,
@@ -86,14 +124,9 @@ def detect_common(
     ):
         for path in tqdm(image_paths, desc=f"Detecting keypoints / {model_name}"):
             key = path.name
+            rot = 0
             with torch.inference_mode():
-                if model_name == "sift":
-                    image = load_torch_image(path, load_type="GRAY32", device=config.device).to(torch.float32)
-                if model_name == "dedodeg":
-                    image = load_torch_image(path, load_type="RGB32", device=config.device).to(torch.float32)
-                if model_name == "disk":
-                    image = load_torch_image(path, load_type="RGB32", device=config.device).to(torch.float32)
-                    image = pad_to_multiple_of_16(image)
+                image, ori_shape = load_resize_image(model_name, path, 1024, config)
 
                 detector = get_detector_by_scene(model_name, scene=scene, config=config)
 
@@ -101,18 +134,19 @@ def detect_common(
                     outputs = apply_rotate(model_name, path, image, detector, config)
                 else:
                     outputs = detector(image)
-                # outputs = detector(image)
 
                 if model_name == "dedodeg":
                     keypoints, scores, descriptions = outputs
                 elif model_name == "disk":
                     keypoints = outputs[0].keypoints
+                    scores = outputs[0].detection_scores
                     descriptions = outputs[0].descriptors
                 elif model_name == "sift":
                     keypoints = outputs[0][..., 2]
-                    responses = outputs[1]  # noqa
+                    scores = outputs[1]  # noqa
                     descriptions = outputs[2]
 
+                keypoints = adjust_keypoints_scale(image, ori_shape, keypoints, rot)
                 kpts = keypoints.squeeze().detach().cpu().numpy()
                 descs = descriptions.squeeze().detach().cpu().numpy()
                 f_keypoints[key] = kpts
