@@ -142,9 +142,9 @@ def detect_common(
                     scores = outputs[0].detection_scores
                     descriptions = outputs[0].descriptors
                 elif model_name == "sift":
-                    keypoints = outputs[0][..., 2]
-                    scores = outputs[1]  # noqa
-                    descriptions = outputs[2]
+                    keypoints = outputs[0][..., 2][0]
+                    scores = outputs[1][0]  # noqa
+                    descriptions = outputs[2][0]
 
                 keypoints = adjust_keypoints_scale(image, ori_shape, keypoints, rot)
                 kpts = keypoints.squeeze().detach().cpu().numpy()
