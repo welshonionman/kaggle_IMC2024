@@ -1,6 +1,13 @@
 from pathlib import Path
 from src.dataclass import Config
-from src.keypoint.detector import feature_lightglue_common, feature_kornia_common, feature_loftr, feature_eloftr
+from src.keypoint.detector import (
+    feature_kornia_common,
+    feature_loftr,
+    feature_eloftr,
+    feature_aliked,
+    feature_superpoint,
+    feature_doghardnet,
+)
 
 
 def detect_keypoints(
@@ -16,7 +23,19 @@ def detect_keypoints(
 
     if "aliked" in detectors:
         model_name = "aliked"
-        feature_lightglue_common(model_name, path_dict, index_pairs, scene, config)
+        feature_aliked(model_name, path_dict, index_pairs, scene, config)
+        files_matches.append(f"{path_dict['feature_dir']}/matches_{model_name}.h5")
+        detected = True
+
+    if "superpoint" in detectors:
+        model_name = "superpoint"
+        feature_superpoint(model_name, path_dict, index_pairs, scene, config)
+        files_matches.append(f"{path_dict['feature_dir']}/matches_{model_name}.h5")
+        detected = True
+
+    if "doghardnet" in detectors:
+        model_name = "doghardnet"
+        feature_doghardnet(model_name, path_dict, index_pairs, scene, config)
         files_matches.append(f"{path_dict['feature_dir']}/matches_{model_name}.h5")
         detected = True
 

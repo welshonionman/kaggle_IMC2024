@@ -1,6 +1,6 @@
 from pathlib import Path
 import torch
-from lightglue import ALIKED, SuperPoint, DoGHardNet
+from lightglue import SuperPoint
 from lightglue.utils import Extractor
 import h5py
 from tqdm import tqdm
@@ -17,17 +17,8 @@ def get_detector(
     detector_config: LightGlueConfig,
     device: torch.device,
 ) -> Extractor:
-    dict_model = {
-        "aliked": ALIKED,
-        "superpoint": SuperPoint,
-        "doghardnet": DoGHardNet,
-    }
-
-    extractor_class = dict_model[model_name]
-
     detector = (
-        extractor_class(
-            model_name=detector_config["model_name"],
+        SuperPoint(
             max_num_keypoints=detector_config["max_num_keypoints"],
             detection_threshold=detector_config["detection_threshold"],
             resize=detector_config["resize_to"],
@@ -158,7 +149,7 @@ def match_with_lightglue_common(
                     print(f"{key1}-{key2}: {n_matches} matches --> skipped")
 
 
-def feature_lightglue_common(
+def feature_superpoint(
     model_name: str,
     path_dict: dict[str, Path | list[Path]],
     index_pairs: list[tuple[int, int]],
