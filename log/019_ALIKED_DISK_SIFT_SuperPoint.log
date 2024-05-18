@@ -1,0 +1,136 @@
+
+church / church -> 110 images
+dioscuri / dioscuri -> 70 images
+lizard / lizard -> 110 images
+multi-temporal-temple-baalshamin / multi-temporal-temple-baalshamin -> 66 images
+pond / pond -> 110 images
+transp_obj_glass_cup / transp_obj_glass_cup -> 36 images
+transp_obj_glass_cylinder / transp_obj_glass_cylinder -> 36 images
+
+
+***** transp_obj_glass_cup *****
+Reconstruction:
+	num_reg_images = 6
+	num_cameras = 6
+	num_points3D = 17
+	num_observations = 72
+	mean_track_length = 4.23529
+	mean_observations_per_image = 12
+	mean_reprojection_error = 1.10459
+Reconstruction:
+	num_reg_images = 36
+	num_cameras = 36
+	num_points3D = 43468
+	num_observations = 176714
+	mean_track_length = 4.06538
+	mean_observations_per_image = 4908.72
+	mean_reprojection_error = 1.5925
+
+Registered: transp_obj_glass_cup / transp_obj_glass_cup -> 36 / 36
+
+
+***** transp_obj_glass_cylinder *****
+Reconstruction:
+	num_reg_images = 18
+	num_cameras = 18
+	num_points3D = 0
+	num_observations = 0
+	mean_track_length = 0
+	mean_observations_per_image = 0
+	mean_reprojection_error = 0
+
+Registered: transp_obj_glass_cylinder / transp_obj_glass_cylinder -> 18 / 36
+
+
+***** multi-temporal-temple-baalshamin *****
+Reconstruction:
+	num_reg_images = 65
+	num_cameras = 65
+	num_points3D = 65129
+	num_observations = 354097
+	mean_track_length = 5.43686
+	mean_observations_per_image = 5447.65
+	mean_reprojection_error = 1.34433
+
+Registered: multi-temporal-temple-baalshamin / multi-temporal-temple-baalshamin -> 65 / 66
+
+
+***** dioscuri *****
+Reconstruction:
+	num_reg_images = 56
+	num_cameras = 56
+	num_points3D = 65504
+	num_observations = 301623
+	mean_track_length = 4.60465
+	mean_observations_per_image = 5386.12
+	mean_reprojection_error = 0.90633
+Reconstruction:
+	num_reg_images = 11
+	num_cameras = 11
+	num_points3D = 10604
+	num_observations = 34440
+	mean_track_length = 3.24783
+	mean_observations_per_image = 3130.91
+	mean_reprojection_error = 1.0809
+
+Registered: dioscuri / dioscuri -> 56 / 70
+
+
+***** lizard *****
+Reconstruction:
+	num_reg_images = 109
+	num_cameras = 109
+	num_points3D = 111218
+	num_observations = 452757
+	mean_track_length = 4.0709
+	mean_observations_per_image = 4153.73
+	mean_reprojection_error = 1.10075
+
+Registered: lizard / lizard -> 109 / 110
+
+
+***** pond *****
+Reconstruction:
+	num_reg_images = 9
+	num_cameras = 9
+	num_points3D = 0
+	num_observations = 0
+	mean_track_length = 0
+	mean_observations_per_image = 0
+	mean_reprojection_error = 0
+Reconstruction:
+	num_reg_images = 81
+	num_cameras = 81
+	num_points3D = 65223
+	num_observations = 245687
+	mean_track_length = 3.76688
+	mean_observations_per_image = 3033.17
+	mean_reprojection_error = 1.06753
+
+Registered: pond / pond -> 81 / 110
+
+
+***** church *****
+Reconstruction:
+	num_reg_images = 109
+	num_cameras = 109
+	num_points3D = 102217
+	num_observations = 799919
+	mean_track_length = 7.82569
+	mean_observations_per_image = 7338.71
+	mean_reprojection_error = 1.05562
+
+Registered: church / church -> 109 / 110
+
+
+[church                           ] mAA:  30.3738%
+[dioscuri                         ] mAA:  42.0398%
+[lizard                           ] mAA:  75.3894%
+[multi-temporal-temple-baalshamin ] mAA:  21.6931%
+[pond                             ] mAA:  53.2710%
+[transp_obj_glass_cup             ] mAA:   2.5253%
+[transp_obj_glass_cylinder        ] mAA:   3.0303%
+
+[ Global mAA                      ] mAA:  32.6175%
+
+Elapsed time: 9272.25 seconds
