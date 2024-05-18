@@ -17,9 +17,11 @@ def get_detector(
     detector_config: LightGlueConfig,
     device: torch.device,
 ) -> Extractor:
+    model_name = detector_config.get("model_name", "aliked-n16")
+    
     detector = (
         ALIKED(
-            model_name=detector_config["model_name"],
+            model_name=model_name,
             max_num_keypoints=detector_config["max_num_keypoints"],
             detection_threshold=detector_config["detection_threshold"],
             resize=detector_config["resize_to"],
