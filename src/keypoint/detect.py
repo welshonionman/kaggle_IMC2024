@@ -2,7 +2,7 @@ from pathlib import Path
 from src.dataclass import Config
 from src.keypoint.detector import (
     feature_loftr,
-    feature_eloftr,
+    # feature_eloftr,
     feature_aliked,
     feature_superpoint,
     feature_doghardnet,
