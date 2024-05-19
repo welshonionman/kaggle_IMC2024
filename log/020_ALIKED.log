@@ -10,36 +10,44 @@ transp_obj_glass_cylinder / transp_obj_glass_cylinder -> 36 images
 
 ***** transp_obj_glass_cup *****
 Reconstruction:
-	num_reg_images = 14
-	num_cameras = 14
-	num_points3D = 5636
-	num_observations = 17030
-	mean_track_length = 3.02165
-	mean_observations_per_image = 1216.43
-	mean_reprojection_error = 1.51033
+	num_reg_images = 2
+	num_cameras = 2
+	num_points3D = 1
+	num_observations = 2
+	mean_track_length = 2
+	mean_observations_per_image = 1
+	mean_reprojection_error = 4.10202e-08
 Reconstruction:
-	num_reg_images = 31
-	num_cameras = 31
-	num_points3D = 8516
-	num_observations = 38333
-	mean_track_length = 4.50129
-	mean_observations_per_image = 1236.55
-	mean_reprojection_error = 1.62942
+	num_reg_images = 36
+	num_cameras = 36
+	num_points3D = 24635
+	num_observations = 123608
+	mean_track_length = 5.01758
+	mean_observations_per_image = 3433.56
+	mean_reprojection_error = 1.71102
 
-Registered: transp_obj_glass_cup / transp_obj_glass_cup -> 31 / 36
+Registered: transp_obj_glass_cup / transp_obj_glass_cup -> 36 / 36
 
 
 ***** transp_obj_glass_cylinder *****
 Reconstruction:
 	num_reg_images = 3
 	num_cameras = 3
-	num_points3D = 4
-	num_observations = 12
-	mean_track_length = 3
-	mean_observations_per_image = 4
-	mean_reprojection_error = 0.128162
+	num_points3D = 3
+	num_observations = 7
+	mean_track_length = 2.33333
+	mean_observations_per_image = 2.33333
+	mean_reprojection_error = 6.65431e-07
+Reconstruction:
+	num_reg_images = 15
+	num_cameras = 15
+	num_points3D = 30
+	num_observations = 267
+	mean_track_length = 8.9
+	mean_observations_per_image = 17.8
+	mean_reprojection_error = 0.560312
 
-Registered: transp_obj_glass_cylinder / transp_obj_glass_cylinder -> 3 / 36
+Registered: transp_obj_glass_cylinder / transp_obj_glass_cylinder -> 15 / 36
 
 
 ***** multi-temporal-temple-baalshamin *****
@@ -136,9 +144,9 @@ Registered: church / church -> 108 / 110
 [lizard                           ] mAA:  79.1277%
 [multi-temporal-temple-baalshamin ] mAA:  21.9577%
 [pond                             ] mAA:  55.6075%
-[transp_obj_glass_cup             ] mAA:   3.0303%
-[transp_obj_glass_cylinder        ] mAA:   2.0202%
+[transp_obj_glass_cup             ] mAA:   2.0202%
+[transp_obj_glass_cylinder        ] mAA:   2.5253%
 
-[ Global mAA                      ] mAA:  32.9442%
+[ Global mAA                      ] mAA:  32.8720%
 
-Elapsed time: 2714.39 seconds
+Elapsed time: 3466.80 seconds

@@ -43,19 +43,19 @@ Registered: multi-temporal-temple-baalshamin / multi-temporal-temple-baalshamin 
 Reconstruction:
 	num_reg_images = 52
 	num_cameras = 52
-	num_points3D = 36268
-	num_observations = 166465
-	mean_track_length = 4.58986
-	mean_observations_per_image = 3201.25
-	mean_reprojection_error = 0.876077
+	num_points3D = 39798
+	num_observations = 181930
+	mean_track_length = 4.57134
+	mean_observations_per_image = 3498.65
+	mean_reprojection_error = 0.865207
 Reconstruction:
 	num_reg_images = 9
 	num_cameras = 9
-	num_points3D = 6173
-	num_observations = 20049
-	mean_track_length = 3.24785
-	mean_observations_per_image = 2227.67
-	mean_reprojection_error = 1.04921
+	num_points3D = 6354
+	num_observations = 20418
+	mean_track_length = 3.21341
+	mean_observations_per_image = 2268.67
+	mean_reprojection_error = 1.05197
 
 Registered: dioscuri / dioscuri -> 52 / 70
 
@@ -116,13 +116,13 @@ Registered: church / church -> 107 / 110
 
 
 [church                           ] mAA:  32.2430%
-[dioscuri                         ] mAA:  39.3035%
+[dioscuri                         ] mAA:  38.3085%
 [lizard                           ] mAA:  59.0343%
 [multi-temporal-temple-baalshamin ] mAA:  23.2804%
 [pond                             ] mAA:  33.0218%
 [transp_obj_glass_cup             ] mAA:   2.0202%
 [transp_obj_glass_cylinder        ] mAA:   0.0000%
 
-[ Global mAA                      ] mAA:  26.9862%
+[ Global mAA                      ] mAA:  26.8440%
 
-Elapsed time: 2305.23 seconds
+Elapsed time: 3808.71 seconds
