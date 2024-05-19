@@ -55,8 +55,8 @@ def get_image_pairs(
 ) -> tuple[torch.Tensor, list[tuple[int, int]]]:
     """類似した画像のペアを取得します"""
     image_paths = path_dict["image_paths"]
-    # if len(image_paths) <= exhaustive_if_less:
-    #     return get_pairs_exhaustive(image_paths)
+    if len(image_paths) <= exhaustive_if_less:
+        return None, get_pairs_exhaustive(image_paths)
 
     matches = []
 

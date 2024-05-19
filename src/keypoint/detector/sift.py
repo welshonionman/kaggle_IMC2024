@@ -17,7 +17,7 @@ def get_detector(
     device: torch.device,
 ) -> KF.DeDoDe:
 
-    detector = KF.SIFTFeature(upright=True).to(device)
+    detector = KF.SIFTFeatureScaleSpace(upright=True).to(device)
 
     return detector
 
