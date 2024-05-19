@@ -67,7 +67,7 @@ def detect_keypoints(
 
     if "eloftr" in detectors:
         model_name = "eloftr"
-        feature_eloftr(path_dict, index_pairs, scene, config)
+        # feature_eloftr(path_dict, index_pairs, scene, config)
         files_matches.append(f"{path_dict['feature_dir']}/matches_{model_name}.h5")
         detected = True
 
