@@ -1,0 +1,102 @@
+
+church / church -> 110 images
+dioscuri / dioscuri -> 70 images
+lizard / lizard -> 110 images
+multi-temporal-temple-baalshamin / multi-temporal-temple-baalshamin -> 66 images
+pond / pond -> 110 images
+transp_obj_glass_cup / transp_obj_glass_cup -> 36 images
+transp_obj_glass_cylinder / transp_obj_glass_cylinder -> 36 images
+
+
+***** transp_obj_glass_cup *****
+Reconstruction:
+	num_reg_images = 36
+	num_cameras = 36
+	num_points3D = 5252
+	num_observations = 26756
+	mean_track_length = 5.09444
+	mean_observations_per_image = 743.222
+	mean_reprojection_error = 1.79923
+
+Registered: transp_obj_glass_cup / transp_obj_glass_cup -> 36 / 36
+
+
+***** transp_obj_glass_cylinder *****
+
+Registered: transp_obj_glass_cylinder / transp_obj_glass_cylinder -> 0 / 36
+
+
+***** multi-temporal-temple-baalshamin *****
+Reconstruction:
+	num_reg_images = 65
+	num_cameras = 65
+	num_points3D = 62447
+	num_observations = 336073
+	mean_track_length = 5.38173
+	mean_observations_per_image = 5170.35
+	mean_reprojection_error = 1.33909
+
+Registered: multi-temporal-temple-baalshamin / multi-temporal-temple-baalshamin -> 65 / 66
+
+
+***** dioscuri *****
+Reconstruction:
+	num_reg_images = 56
+	num_cameras = 56
+	num_points3D = 59461
+	num_observations = 275824
+	mean_track_length = 4.63874
+	mean_observations_per_image = 4925.43
+	mean_reprojection_error = 0.898938
+Reconstruction:
+	num_reg_images = 11
+	num_cameras = 11
+	num_points3D = 9435
+	num_observations = 31181
+	mean_track_length = 3.30482
+	mean_observations_per_image = 2834.64
+	mean_reprojection_error = 1.08781
+Reconstruction:
+	num_reg_images = 5
+	num_cameras = 5
+	num_points3D = 1977
+	num_observations = 4663
+	mean_track_length = 2.35862
+	mean_observations_per_image = 932.6
+	mean_reprojection_error = 0.888154
+
+Registered: dioscuri / dioscuri -> 56 / 70
+
+
+***** lizard *****
+Reconstruction:
+	num_reg_images = 103
+	num_cameras = 103
+	num_points3D = 99153
+	num_observations = 406471
+	mean_track_length = 4.09943
+	mean_observations_per_image = 3946.32
+	mean_reprojection_error = 1.07451
+Reconstruction:
+	num_reg_images = 5
+	num_cameras = 5
+	num_points3D = 649
+	num_observations = 1523
+	mean_track_length = 2.34669
+	mean_observations_per_image = 304.6
+	mean_reprojection_error = 1.16907
+
+Registered: lizard / lizard -> 103 / 110
+
+
+***** pond *****
+Reconstruction:
+	num_reg_images = 80
+	num_cameras = 80
+	num_points3D = 60304
+	num_observations = 233265
+	mean_track_length = 3.86815
+	mean_observations_per_image = 2915.81
+	mean_reprojection_error = 1.06247
+
+Registered: pond / pond -> 80 / 110
