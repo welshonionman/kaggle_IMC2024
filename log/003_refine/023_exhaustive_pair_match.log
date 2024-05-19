@@ -100,3 +100,29 @@ Reconstruction:
 	mean_reprojection_error = 1.06247
 
 Registered: pond / pond -> 80 / 110
+
+
+***** church *****
+Reconstruction:
+	num_reg_images = 108
+	num_cameras = 108
+	num_points3D = 91773
+	num_observations = 709974
+	mean_track_length = 7.7362
+	mean_observations_per_image = 6573.83
+	mean_reprojection_error = 1.0422
+
+Registered: church / church -> 108 / 110
+
+
+[church                           ] mAA:  31.4642%
+[dioscuri                         ] mAA:  41.0448%
+[lizard                           ] mAA:  71.4953%
+[multi-temporal-temple-baalshamin ] mAA:  21.1640%
+[pond                             ] mAA:  54.8287%
+[transp_obj_glass_cup             ] mAA:   3.0303%
+[transp_obj_glass_cylinder        ] mAA:   0.0000%
+
+[ Global mAA                      ] mAA:  31.8610%
+
+Elapsed time: 10282.68 seconds
