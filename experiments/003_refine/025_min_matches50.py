@@ -30,8 +30,8 @@ class Config:
         "lizard",
         "multi-temporal-temple-baalshamin",
         "pond",
-        # "transp_obj_glass_cup",
-        # "transp_obj_glass_cylinder",
+        "transp_obj_glass_cup",
+        "transp_obj_glass_cylinder",
     ]
     device: torch.device = K.utils.get_cuda_device_if_available(0)
 
