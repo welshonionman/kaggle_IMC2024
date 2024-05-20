@@ -30,8 +30,8 @@ class Config:
         "lizard",
         "multi-temporal-temple-baalshamin",
         "pond",
-        "transp_obj_glass_cup",
-        "transp_obj_glass_cylinder",
+        # "transp_obj_glass_cup",
+        # "transp_obj_glass_cylinder",
     ]
     device: torch.device = K.utils.get_cuda_device_if_available(0)
 
@@ -68,8 +68,8 @@ class Config:
 
     # import_into_colmap function's arguments
     colmap_mapper_options = {
-        "min_model_size": 5,  # By default colmap does not generate a reconstruction if less than 10 images are registered. Lower it to 3.
-        "max_num_models": 5,
+        "min_model_size": 3,  # By default colmap does not generate a reconstruction if less than 10 images are registered. Lower it to 3.
+        "max_num_models": 2,
         "num_threads": 1,
     }
 

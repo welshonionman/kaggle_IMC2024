@@ -41,7 +41,7 @@ class Config:
         "similarity_threshold": 0.3,
         "tolerance": 500,
         "min_matches": 50,
-        "exhaustive_if_less": 50,
+        "exhaustive_if_less": 500,
         "p": 2.0,
     }
 
@@ -62,14 +62,14 @@ class Config:
 
     # keypoint_distances function's arguments
     matching_config = {
-        "min_matches": 15,
+        "min_matches": 25,
         "verbose": False,
     }
 
     # import_into_colmap function's arguments
     colmap_mapper_options = {
-        "min_model_size": 5,  # By default colmap does not generate a reconstruction if less than 10 images are registered. Lower it to 3.
-        "max_num_models": 3,
+        "min_model_size": 3,  # By default colmap does not generate a reconstruction if less than 10 images are registered. Lower it to 3.
+        "max_num_models": 2,
         "num_threads": 1,
     }
 

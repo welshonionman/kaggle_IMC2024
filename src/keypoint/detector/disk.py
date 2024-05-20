@@ -5,6 +5,7 @@ import h5py
 import numpy as np
 import gc
 import torch.nn.functional as F
+import kornia as K
 import kornia.feature as KF
 from src.utils import load_torch_image
 from src.dataclass import Config
@@ -15,7 +16,7 @@ def get_detector(
     model_name: str,
     detector_config: dict,
     device: torch.device,
-) -> KF.DeDoDe:
+) -> K.core.Module:
     detector = (
         KF.DISK()
         .from_pretrained(
@@ -102,7 +103,7 @@ def detect_common(
                 if is_rotate and ("air-to-ground" in config.cat2scenes_dict) and (scene in config.cat2scenes_dict["air-to-ground"]):
                     outputs = apply_rotate(model_name, path, image, detector, config)
                 else:
-                    outputs = detector(image)
+                    outputs = detector(image, n=4096, score_threshold=0.01)
 
                 keypoints = outputs[0].keypoints
                 scores = outputs[0].detection_scores

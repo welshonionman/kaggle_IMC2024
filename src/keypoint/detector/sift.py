@@ -5,6 +5,7 @@ import h5py
 import numpy as np
 import gc
 import torch.nn.functional as F
+import kornia as K
 import kornia.feature as KF
 from src.utils import load_torch_image
 from src.dataclass import Config
@@ -15,9 +16,8 @@ def get_detector(
     model_name: str,
     detector_config: dict,
     device: torch.device,
-) -> KF.DeDoDe:
-
-    detector = KF.SIFTFeatureScaleSpace(upright=True).to(device)
+) -> K.core.Module:
+    detector = KF.SIFTFeatureScaleSpace(num_features=4096, upright=True).to(device)
 
     return detector
 

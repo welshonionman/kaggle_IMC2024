@@ -78,7 +78,7 @@ def apply_rotate(
         return keypoints_rot, scores, descriptions
 
     if model_name == "disk":
-        features = detector(image)
+        features = detector(image, n=4096, score_threshold=0.01)
         keypoints = features[0].keypoints
         tmp_np = keypoints.cpu().numpy()
         rot_kpts = rotate_kpts(tmp_np, (image.shape[3], image.shape[2]), correct_rot)
